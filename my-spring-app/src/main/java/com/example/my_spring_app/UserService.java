@@ -101,8 +101,10 @@ public class UserService {
 
     private User fromJson(String line) {
         try {
-            return objectMapper.readValue(line, User.class);
+            User user = objectMapper.readValue(line, User.class);
+            return user;
         } catch (IOException e) {
+            System.err.println("DEBUG: Failed to parse user record: " + line);
             throw new RuntimeException("Unable to parse user record", e);
         }
     }
