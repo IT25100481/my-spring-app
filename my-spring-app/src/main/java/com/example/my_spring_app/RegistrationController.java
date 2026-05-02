@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 @RestController
@@ -76,6 +79,27 @@ public class RegistrationController {
             return ResponseEntity.internalServerError()
                     .body(Map.of("status", "error",
                             "message", "Something went wrong. Try again."));
+        }
+    }
+
+    // ── GET CATEGORIES ──
+    @GetMapping("/categories.txt")
+    public ResponseEntity<String> getCategories() {
+        try {
+            Path path = Paths.get("categories.txt");
+            if (!Files.exists(path)) {
+                return ResponseEntity.ok("")
+                        .header("Content-Type", "text/plain")
+                        .build();
+            }
+            String content = Files.readString(path);
+            return ResponseEntity.ok()
+                    .header("Content-Type", "text/plain")
+                    .body(content);
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError()
+                    .header("Content-Type", "text/plain")
+                    .body("");
         }
     }
 }

@@ -4,11 +4,12 @@ import com.example.my_spring_app.User;
 import com.example.my_spring_app.UserRole;
 import com.example.my_spring_app.Vendor;
 import com.example.my_spring_app.VerificationStatus;
-import com.example.my_spring_app.repositories.UserRepository;
-import com.example.my_spring_app.repositories.VendorRepository;
+import com.example.my_spring_app.UserService;
+import com.example.my_spring_app.VendorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -16,23 +17,22 @@ import java.util.Optional;
 public class AuthService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private VendorRepository vendorRepository;
+    private VendorService vendorService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private EmailService emailService;
+    // @Autowired
+    // private EmailService emailService;
 
     /**
      * Register a new customer user
      */
     public User registerUser(String fullName, String email, String password, String phone) {
-        // Check if email already exists
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userService.emailExists(email)) {
             throw new RuntimeException("Email already registered");
         }
 
@@ -44,25 +44,27 @@ public class AuthService {
         user.setRole(UserRole.CUSTOMER);
         user.setIsActive(true);
 
-        User savedUser = userRepository.save(user);
-        
-        // Send welcome email
-        emailService.sendWelcomeEmail(savedUser.getEmail(), savedUser.getFullName());
-        
+        User savedUser = userService.saveUser(user);
+        // emailService.sendWelcomeEmail(savedUser.getEmail(), savedUser.getFullName());
         return savedUser;
     }
 
     /**
      * Register a new vendor
      */
-    public Vendor registerVendor(String businessName, String email, String password, 
+    public Vendor registerVendor(String businessName, String email, String password,
                                 String phone, String category) {
-        // Check if email already exists
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userService.emailExists(email)) {
             throw new RuntimeException("Email already registered");
         }
 
-        // Create user account for vendor
+        Vendor vendor = new Vendor();
+        vendor.setBusinessName(businessName);
+        vendor.setBusinessPhone(phone);
+        vendor.setCategory(category);
+        vendor.setIsActive(true);
+        vendor.setVerificationStatus(VerificationStatus.PENDING);
+
         User user = new User();
         user.setFullName(businessName);
         user.setEmail(email);
@@ -71,22 +73,10 @@ public class AuthService {
         user.setRole(UserRole.VENDOR);
         user.setIsActive(true);
 
-        User savedUser = userRepository.save(user);
+        vendor.setUser(user);
+        Vendor savedVendor = vendorService.saveVendor(vendor);
 
-        // Create vendor profile
-        Vendor vendor = new Vendor();
-        vendor.setUser(savedUser);
-        vendor.setBusinessName(businessName);
-        vendor.setBusinessPhone(phone);
-        vendor.setCategory(category);
-        vendor.setIsActive(true);
-        vendor.setVerificationStatus(VerificationStatus.PENDING);
-
-        Vendor savedVendor = vendorRepository.save(vendor);
-
-        // Send vendor registration email
-        emailService.sendVendorRegistrationEmail(email, businessName);
-
+        // emailService.sendVendorRegistrationEmail(email, businessName);
         return savedVendor;
     }
 
@@ -94,14 +84,13 @@ public class AuthService {
      * Authenticate user and return user object if valid
      */
     public User authenticateUser(String email, String password) {
-        Optional<User> userOptional = userRepository.findByEmailAndIsActiveTrue(email);
-        
+        Optional<User> userOptional = userService.findByEmailAndIsActiveTrue(email);
+
         if (userOptional.isEmpty()) {
             throw new RuntimeException("Invalid email or password");
         }
 
         User user = userOptional.get();
-        
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid email or password");
         }
@@ -113,34 +102,28 @@ public class AuthService {
      * Get user by email
      */
     public Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userService.findByEmail(email);
     }
 
     /**
      * Reset password with token
      */
     public void resetPassword(String email, String newPassword) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        
-        if (userOptional.isEmpty()) {
-            throw new RuntimeException("User not found");
-        }
+        User user = userService.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        User user = userOptional.get();
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setUpdatedAt(LocalDateTime.now());
-        
-        userRepository.save(user);
-        
-        // Send password reset confirmation email
-        emailService.sendPasswordResetEmail(email, user.getFullName());
+        userService.saveUser(user);
+
+        // emailService.sendPasswordResetEmail(email, user.getFullName());
     }
 
     /**
      * Change password (requires old password verification)
      */
     public void changePassword(Long userId, String oldPassword, String newPassword) {
-        User user = userRepository.findById(userId)
+        User user = userService.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
@@ -149,17 +132,16 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setUpdatedAt(LocalDateTime.now());
-        
-        userRepository.save(user);
+        userService.saveUser(user);
     }
 
     /**
      * Get vendor by user ID
      */
     public Optional<Vendor> getVendorByUserId(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
+        Optional<User> user = userService.findById(userId);
         if (user.isPresent()) {
-            return vendorRepository.findByUser_Email(user.get().getEmail());
+            return vendorService.findByUserEmail(user.get().getEmail());
         }
         return Optional.empty();
     }
@@ -168,40 +150,40 @@ public class AuthService {
      * Check if email exists
      */
     public boolean emailExists(String email) {
-        return userRepository.findByEmail(email).isPresent();
+        return userService.emailExists(email);
     }
 
     /**
      * Approve vendor profile (admin function)
      */
     public void approveVendor(Long vendorId) {
-        Vendor vendor = vendorRepository.findById(vendorId)
+        Vendor vendor = vendorService.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
         vendor.setVerificationStatus(VerificationStatus.APPROVED);
         vendor.setApprovedAt(LocalDateTime.now());
         vendor.setUpdatedAt(LocalDateTime.now());
+        vendorService.saveVendor(vendor);
 
-        vendorRepository.save(vendor);
-        
-        // Send approval email
-        emailService.sendVendorApprovalEmail(vendor.getUser().getEmail(), vendor.getBusinessName());
+        // if (vendor.getUser() != null) {
+        //     emailService.sendVendorApprovalEmail(vendor.getUser().getEmail(), vendor.getBusinessName());
+        // }
     }
 
     /**
      * Reject vendor profile (admin function)
      */
     public void rejectVendor(Long vendorId, String reason) {
-        Vendor vendor = vendorRepository.findById(vendorId)
+        Vendor vendor = vendorService.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
         vendor.setVerificationStatus(VerificationStatus.REJECTED);
         vendor.setUpdatedAt(LocalDateTime.now());
+        vendorService.saveVendor(vendor);
 
-        vendorRepository.save(vendor);
-        
-        // Send rejection email
-        emailService.sendVendorRejectionEmail(vendor.getUser().getEmail(), 
-                vendor.getBusinessName(), reason);
+        // if (vendor.getUser() != null) {
+        //     emailService.sendVendorRejectionEmail(vendor.getUser().getEmail(),
+        //             vendor.getBusinessName(), reason);
+        // }
     }
 }

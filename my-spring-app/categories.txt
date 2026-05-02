@@ -1,0 +1,15 @@
+photography:Photography
+videography:Videography
+catering:Catering
+venue:Venue
+decoration:Decoration
+music:Music & DJ
+flowers:Flowers & Florist
+cake:Cake & Desserts
+invitations:Invitations
+transportation:Transportation
+beauty:Beauty & Hair
+officiant:Officiant
+lighting:Lighting
+sound:Sound System
+photo_booth:Photo Booth

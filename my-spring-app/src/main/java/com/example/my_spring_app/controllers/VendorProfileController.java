@@ -1,12 +1,11 @@
 package com.example.my_spring_app.controllers;
 
-import com.example.my_spring_app.User;
 import com.example.my_spring_app.Vendor;
 import com.example.my_spring_app.dtos.VendorProfileResponse;
 import com.example.my_spring_app.dtos.VendorProfileUpdateRequest;
-import com.example.my_spring_app.repositories.VendorRepository;
 import com.example.my_spring_app.security.JwtTokenProvider;
 import com.example.my_spring_app.services.VendorProfileService;
+import com.example.my_spring_app.services.VendorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,14 +21,14 @@ import java.util.Map;
 public class VendorProfileController {
 
     private final VendorProfileService vendorProfileService;
-    private final VendorRepository vendorRepository;
+    private final VendorService vendorService;
     private final JwtTokenProvider jwtTokenProvider;
 
     public VendorProfileController(VendorProfileService vendorProfileService,
-                                   VendorRepository vendorRepository,
+                                   VendorService vendorService,
                                    JwtTokenProvider jwtTokenProvider) {
         this.vendorProfileService = vendorProfileService;
-        this.vendorRepository = vendorRepository;
+        this.vendorService = vendorService;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -79,7 +78,7 @@ public class VendorProfileController {
                         .body(error("Authorization token or email is required"));
             }
 
-            Vendor vendor = vendorRepository.findByUser_Email(resolvedEmail)
+            Vendor vendor = vendorService.findByUserEmail(resolvedEmail)
                     .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
             return ResponseEntity.ok(vendorProfileService.updateVendorProfile(vendor.getId(), request));
@@ -100,7 +99,7 @@ public class VendorProfileController {
                         .body(error("Authorization token or email is required"));
             }
 
-            Vendor vendor = vendorRepository.findByUser_Email(resolvedEmail)
+            Vendor vendor = vendorService.findByUserEmail(resolvedEmail)
                     .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
             return ResponseEntity.ok(vendorProfileService.uploadProfilePhoto(vendor.getId(), file));
@@ -121,7 +120,7 @@ public class VendorProfileController {
                         .body(error("Authorization token or email is required"));
             }
 
-            Vendor vendor = vendorRepository.findByUser_Email(resolvedEmail)
+            Vendor vendor = vendorService.findByUserEmail(resolvedEmail)
                     .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
             return ResponseEntity.ok(vendorProfileService.uploadPortfolioMedia(vendor.getId(), file));

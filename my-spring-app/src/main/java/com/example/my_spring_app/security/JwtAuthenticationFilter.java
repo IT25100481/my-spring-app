@@ -1,6 +1,7 @@
 package com.example.my_spring_app.security;
 
-import com.example.my_spring_app.repositories.UserRepository;
+import com.example.my_spring_app.User;
+import com.example.my_spring_app.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenProvider tokenProvider;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -32,12 +33,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 String email = tokenProvider.getUserEmailFromToken(jwt);
 
-                userRepository.findByEmail(email).ifPresent(user -> {
-                    UsernamePasswordAuthenticationToken authentication = 
+                userService.findByEmail(email).ifPresent(user -> {
+                    UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                user,
-                                null,
-                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
+                                    user,
+                                    null,
+                                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 });
