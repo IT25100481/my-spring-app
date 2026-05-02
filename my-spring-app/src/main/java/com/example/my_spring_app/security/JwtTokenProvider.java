@@ -4,6 +4,8 @@ import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.example.my_spring_app.UserService;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -63,4 +65,18 @@ public class JwtTokenProvider {
         }
         return false;
     }
+
+    // Return the user id associated with the token's subject (email), or null if not found
+    public Long getUserIdFromToken(String token) {
+        try {
+            String email = getUserEmailFromToken(token);
+            if (email == null) return null;
+            return userService.findByEmail(email).map(u -> u.getId()).orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Autowired
+    private UserService userService;
 }

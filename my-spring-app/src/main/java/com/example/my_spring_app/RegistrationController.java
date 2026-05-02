@@ -87,13 +87,13 @@ public class RegistrationController {
     public ResponseEntity<String> getCategories() {
         try {
             Path path = Paths.get("categories.txt");
-            if (!Files.exists(path)) {
-                return ResponseEntity.ok("")
-                        .header("Content-Type", "text/plain")
-                        .build();
-            }
-            String content = Files.readString(path);
-            return ResponseEntity.ok()
+                if (!Files.exists(path)) {
+                return ResponseEntity.ok()
+                    .header("Content-Type", "text/plain")
+                    .body("");
+                }
+                String content = Files.readString(path);
+                return ResponseEntity.ok()
                     .header("Content-Type", "text/plain")
                     .body(content);
         } catch (IOException e) {

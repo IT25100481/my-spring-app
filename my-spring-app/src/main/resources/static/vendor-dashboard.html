@@ -282,7 +282,7 @@
         <a href="/vendor/services">Services</a>
         <a href="/vendor/bookings">Bookings</a>
         <a href="/vendor/payments">Payments</a>
-        <a href="/logout">Logout</a>
+        <a href="#" onclick="logout(event)">Logout</a>
     </nav>
 </header>
 
@@ -290,8 +290,8 @@
     <section class="hero">
         <div class="hero-card">
             <div class="eyebrow">Vendor Control Center</div>
-            <h1 class="title">A professional dashboard for your wedding business.</h1>
-            <p class="hero-text" id="heroText">Loading your profile, bookings, messages, payments, and performance metrics...</p>
+            <h1 class="title">Your wedding business, beautifully organized.</h1>
+            <p class="hero-text" id="heroText">Track your profile, bookings, messages, payments, and performance insights in one elegant workspace.</p>
             <div class="hero-actions">
                 <a class="btn btn-gold" href="/vendor/profile">Edit Profile</a>
                 <a class="btn btn-ghost" href="/vendor/services">Manage Services</a>
@@ -561,6 +561,17 @@
 
     function refreshDashboard() {
         loadDashboard();
+    }
+
+    function logout(event) {
+        if (event) {
+            event.preventDefault();
+        }
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userName');
+        window.location.href = '/login.html';
     }
 
     if (!email) {
