@@ -1,4 +1,4 @@
-﻿package com.example.my_spring_app;
+package com.example.my_spring_app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
