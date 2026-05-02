@@ -101,12 +101,27 @@ public class UserService {
 
     private User fromJson(String line) {
         try {
-            User user = objectMapper.readValue(line, User.class);
-            return user;
+            return objectMapper.readValue(line, User.class);
         } catch (IOException e) {
-            System.err.println("DEBUG: Failed to parse user record: " + line);
-            throw new RuntimeException("Unable to parse user record", e);
+            return fromLegacyCsv(line);
         }
+    }
+
+    private User fromLegacyCsv(String line) {
+        String[] parts = line.split(",", -1);
+        if (parts.length < 4) {
+            throw new RuntimeException("Unable to parse user record");
+        }
+
+        User user = new User();
+        user.setFullName(parts[0].trim());
+        user.setEmail(parts[1].trim());
+        user.setPassword(parts[2].trim());
+        user.setPhone(parts[3].trim());
+        user.setRole(UserRole.CUSTOMER);
+        user.setIsActive(true);
+        user.setCreatedAt(LocalDateTime.now());
+        return user;
     }
 
     private String toJson(User user) {

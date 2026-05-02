@@ -49,6 +49,8 @@
     </div>
 </div>
 <script>
+    const authToken = localStorage.getItem('authToken') || '';
+
     function showMessage(message, type = 'success') {
         const box = document.getElementById('messageBox');
         box.className = `alert alert-${type}`;
@@ -58,6 +60,21 @@
 
     function getEmail() {
         return localStorage.getItem('userEmail') || '';
+    }
+
+    function authHeaders(extra = {}) {
+        const headers = { ...extra };
+        if (authToken) {
+            headers.Authorization = `Bearer ${authToken}`;
+        }
+        return headers;
+    }
+
+    function authFetch(url, options = {}) {
+        return fetch(url, {
+            ...options,
+            headers: authHeaders(options.headers || {})
+        });
     }
 
     function action(url, method = 'POST') {
@@ -100,7 +117,7 @@
 
     function loadBookings() {
         const email = getEmail();
-        fetch(`/api/vendor/bookings?email=${encodeURIComponent(email)}`)
+        authFetch(`/api/vendor/bookings?email=${encodeURIComponent(email)}`)
             .then(response => response.json())
             .then(renderBookings)
             .catch(() => showMessage('Could not load bookings.', 'danger'));
@@ -110,7 +127,7 @@
         const email = getEmail();
         const startDate = document.getElementById('rangeStart').value;
         const endDate = document.getElementById('rangeEnd').value;
-        fetch(`/api/vendor/bookings/upcoming?email=${encodeURIComponent(email)}&startDate=${startDate}&endDate=${endDate}`)
+        authFetch(`/api/vendor/bookings/upcoming?email=${encodeURIComponent(email)}&startDate=${startDate}&endDate=${endDate}`)
             .then(response => response.json())
             .then(renderBookings)
             .catch(() => showMessage('Could not load upcoming bookings.', 'danger'));
@@ -118,7 +135,7 @@
 
     function updateBooking(id, actionName) {
         const email = getEmail();
-        fetch(`/api/vendor/bookings/${id}/${actionName}?email=${encodeURIComponent(email)}`, { method: 'POST' })
+        authFetch(`/api/vendor/bookings/${id}/${actionName}?email=${encodeURIComponent(email)}`, { method: 'POST' })
             .then(response => response.json())
             .then(() => {
                 showMessage(`Booking ${actionName}ed successfully.`, 'success');
@@ -132,7 +149,7 @@
         const quotedPrice = prompt('Enter quoted price:');
         const notes = prompt('Enter negotiation notes:');
         if (!quotedPrice) return;
-        fetch(`/api/vendor/bookings/${id}/negotiate?email=${encodeURIComponent(email)}&quotedPrice=${encodeURIComponent(quotedPrice)}&notes=${encodeURIComponent(notes || '')}`, { method: 'POST' })
+        authFetch(`/api/vendor/bookings/${id}/negotiate?email=${encodeURIComponent(email)}&quotedPrice=${encodeURIComponent(quotedPrice)}&notes=${encodeURIComponent(notes || '')}`, { method: 'POST' })
             .then(response => response.json())
             .then(() => {
                 showMessage('Negotiation saved.', 'success');

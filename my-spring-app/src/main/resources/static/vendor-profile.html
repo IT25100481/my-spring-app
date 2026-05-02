@@ -162,6 +162,8 @@
     </div>
 </div>
 <script>
+    const authToken = localStorage.getItem('authToken') || '';
+
     const categories = [
         'CATERING',
         'PHOTOGRAPHY',
@@ -185,6 +187,21 @@
         return localStorage.getItem('userEmail') || '';
     }
 
+    function authHeaders(extra = {}) {
+        const headers = { ...extra };
+        if (authToken) {
+            headers.Authorization = `Bearer ${authToken}`;
+        }
+        return headers;
+    }
+
+    function authFetch(url, options = {}) {
+        return fetch(url, {
+            ...options,
+            headers: authHeaders(options.headers || {})
+        });
+    }
+
     function populateCategories() {
         const select = document.getElementById('category');
         select.innerHTML = '<option value="">Select a category</option>';
@@ -203,7 +220,7 @@
             return;
         }
 
-        fetch(`/api/vendor/profile?email=${encodeURIComponent(email)}`)
+        authFetch(`/api/vendor/profile?email=${encodeURIComponent(email)}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('businessName').value = data.businessName || '';
@@ -247,7 +264,7 @@
             portfolioMediaUrls: document.getElementById('portfolioMediaUrls').value
         };
 
-        fetch(`/api/vendor/profile?email=${encodeURIComponent(email)}`, {
+        authFetch(`/api/vendor/profile?email=${encodeURIComponent(email)}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -268,7 +285,7 @@
         const formData = new FormData();
         formData.append('file', fileInput.files[0]);
 
-        fetch(`/api/vendor/profile/photo?email=${encodeURIComponent(email)}`, {
+        authFetch(`/api/vendor/profile/photo?email=${encodeURIComponent(email)}`, {
             method: 'POST',
             body: formData
         })
@@ -288,7 +305,7 @@
         const formData = new FormData();
         formData.append('file', fileInput.files[0]);
 
-        fetch(`/api/vendor/profile/portfolio?email=${encodeURIComponent(email)}`, {
+        authFetch(`/api/vendor/profile/portfolio?email=${encodeURIComponent(email)}`, {
             method: 'POST',
             body: formData
         })

@@ -43,7 +43,7 @@ public class RegistrationController {
                     .body(Map.of("status", "success",
                             "message", "User registered successfully!"));
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(Map.of("status", "error",
                             "message", "Something went wrong. Try again."));
@@ -75,7 +75,7 @@ public class RegistrationController {
                     .body(Map.of("status", "success",
                             "message", "Vendor registered successfully!"));
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(Map.of("status", "error",
                             "message", "Something went wrong. Try again."));

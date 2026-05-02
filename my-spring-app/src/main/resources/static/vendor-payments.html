@@ -73,28 +73,45 @@
 </div>
 <script>
     const email = localStorage.getItem('userEmail') || '';
+    const authToken = localStorage.getItem('authToken') || '';
+
+    function authHeaders(extra = {}) {
+        const headers = { ...extra };
+        if (authToken) {
+            headers.Authorization = `Bearer ${authToken}`;
+        }
+        return headers;
+    }
+
+    function authFetch(url, options = {}) {
+        return fetch(url, {
+            ...options,
+            headers: authHeaders(options.headers || {})
+        });
+    }
+
     function showMessage(message, type='success') { const box=document.getElementById('messageBox'); box.className=`alert alert-${type}`; box.textContent=message; box.classList.remove('d-none'); }
     function loadPayments() {
-        fetch(`/api/vendor/payments?email=${encodeURIComponent(email)}`)
+        authFetch(`/api/vendor/payments?email=${encodeURIComponent(email)}`)
             .then(r => r.json())
             .then(items => { const list=document.getElementById('paymentsList'); list.innerHTML=''; if (!items.length) list.innerHTML='<p class="small-muted mb-0">No payments found.</p>'; items.forEach(p => { const div=document.createElement('div'); div.className='entry'; div.innerHTML=`<strong>Booking #${p.booking?.id || ''}</strong><div class="small-muted">Amount Paid: ${p.amountPaid || 0}</div><div class="small-muted">Status: ${p.paymentStatus || ''}</div><div class="small-muted">Method: ${p.paymentMethod || ''}</div>`; list.appendChild(div); }); });
-        fetch(`/api/vendor/payments/invoices?email=${encodeURIComponent(email)}`)
+        authFetch(`/api/vendor/payments/invoices?email=${encodeURIComponent(email)}`)
             .then(r => r.json())
             .then(items => { const list=document.getElementById('invoicesList'); list.innerHTML=''; if (!items.length) list.innerHTML='<p class="small-muted mb-0">No invoices found.</p>'; items.forEach(i => { const div=document.createElement('div'); div.className='entry'; div.innerHTML=`<strong>${i.invoiceNumber || ''}</strong><div class="small-muted">Total: ${i.totalAmount || 0}</div><div class="small-muted">Status: ${i.status || ''}</div>`; list.appendChild(div); }); });
-        fetch(`/api/vendor/payments/earnings?email=${encodeURIComponent(email)}`)
+        authFetch(`/api/vendor/payments/earnings?email=${encodeURIComponent(email)}`)
             .then(r => r.json())
             .then(data => { document.getElementById('earningsTotal').textContent = data.earnings ?? 0; });
     }
     function generateInvoice() {
         const params = new URLSearchParams({ email, bookingId: document.getElementById('invoiceBookingId').value, subtotal: document.getElementById('subtotal').value, taxPercentage: document.getElementById('taxPercentage').value, dueDate: document.getElementById('dueDate').value });
-        fetch('/api/vendor/payments/invoices?' + params.toString(), { method:'POST' })
+        authFetch('/api/vendor/payments/invoices?' + params.toString(), { method:'POST' })
             .then(r => r.json())
             .then(() => { showMessage('Invoice generated.'); loadPayments(); })
             .catch(() => showMessage('Could not generate invoice.', 'danger'));
     }
     function recordPayment() {
         const params = new URLSearchParams({ email, bookingId: document.getElementById('paymentBookingId').value, amountPaid: document.getElementById('amountPaid').value, paymentMethod: document.getElementById('paymentMethod').value, transactionId: document.getElementById('transactionId').value });
-        fetch('/api/vendor/payments/record?' + params.toString(), { method:'POST' })
+        authFetch('/api/vendor/payments/record?' + params.toString(), { method:'POST' })
             .then(r => r.json())
             .then(() => { showMessage('Payment recorded.'); loadPayments(); })
             .catch(() => showMessage('Could not record payment.', 'danger'));

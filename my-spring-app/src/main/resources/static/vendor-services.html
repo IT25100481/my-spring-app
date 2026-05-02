@@ -69,6 +69,8 @@
     </div>
 </div>
 <script>
+    const authToken = localStorage.getItem('authToken') || '';
+
     function showMessage(message, type = 'success') {
         const box = document.getElementById('messageBox');
         box.className = `alert alert-${type}`;
@@ -80,6 +82,21 @@
         return localStorage.getItem('userEmail') || '';
     }
 
+    function authHeaders(extra = {}) {
+        const headers = { ...extra };
+        if (authToken) {
+            headers.Authorization = `Bearer ${authToken}`;
+        }
+        return headers;
+    }
+
+    function authFetch(url, options = {}) {
+        return fetch(url, {
+            ...options,
+            headers: authHeaders(options.headers || {})
+        });
+    }
+
     function loadServices() {
         const email = getEmail();
         if (!email) {
@@ -87,7 +104,7 @@
             return;
         }
 
-        fetch(`/api/vendor/services?email=${encodeURIComponent(email)}`)
+        authFetch(`/api/vendor/services?email=${encodeURIComponent(email)}`)
             .then(response => response.json())
             .then(services => {
                 const list = document.getElementById('servicesList');
@@ -143,7 +160,7 @@
             isAvailable: document.getElementById('serviceAvailable').value === 'true'
         };
 
-        fetch(`/api/vendor/services?email=${encodeURIComponent(email)}`, {
+        authFetch(`/api/vendor/services?email=${encodeURIComponent(email)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -159,7 +176,7 @@
 
     function deleteService(serviceId) {
         const email = getEmail();
-        fetch(`/api/vendor/services/${serviceId}?email=${encodeURIComponent(email)}`, { method: 'DELETE' })
+        authFetch(`/api/vendor/services/${serviceId}?email=${encodeURIComponent(email)}`, { method: 'DELETE' })
             .then(response => response.json())
             .then(() => {
                 showMessage('Service deleted.', 'success');
@@ -170,7 +187,7 @@
 
     function toggleService(serviceId, isAvailable) {
         const email = getEmail();
-        fetch(`/api/vendor/services/${serviceId}/availability?email=${encodeURIComponent(email)}&isAvailable=${isAvailable}`, { method: 'PATCH' })
+        authFetch(`/api/vendor/services/${serviceId}/availability?email=${encodeURIComponent(email)}&isAvailable=${isAvailable}`, { method: 'PATCH' })
             .then(response => response.json())
             .then(() => {
                 showMessage('Service availability updated.', 'success');
@@ -191,7 +208,7 @@
             isActive: true
         };
 
-        fetch(`/api/vendor/services/${serviceId}/packages?email=${encodeURIComponent(email)}`, {
+        authFetch(`/api/vendor/services/${serviceId}/packages?email=${encodeURIComponent(email)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
