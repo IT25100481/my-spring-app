@@ -1,32 +1,482 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Register</title>
+    <title>Register — Wedding Planner</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/833/833472.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-light: #e8d5a3;
+            --gold-dark: #9a7a2e;
+            --cream: #fdf8f2;
+            --dark: #1a1209;
+            --text-muted: #7a6a50;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            min-height: 100vh;
+            display: flex;
+            background: var(--cream);
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            width: 45%;
+            background: var(--dark);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 60px;
+        }
+
+        .left-panel-bg {
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800') center/cover;
+            opacity: 0.2;
+        }
+
+        .left-panel-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(26,18,9,0.98) 0%, rgba(26,18,9,0.5) 100%);
+        }
+
+        .left-content { position: relative; z-index: 2; }
+
+        .brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 300;
+            position: absolute;
+            top: 60px;
+            left: 60px;
+            z-index: 2;
+            text-decoration: none;
+        }
+
+        .left-tag {
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .left-tag::before {
+            content: '';
+            height: 1px;
+            width: 24px;
+            background: var(--gold);
+        }
+
+        .left-panel h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .left-panel h2 em { font-style: italic; color: var(--gold-light); }
+
+        .left-panel p {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.8;
+        }
+
+        .left-divider {
+            height: 1px;
+            background: rgba(201,168,76,0.2);
+            margin: 28px 0;
+        }
+
+        .left-feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 12px;
+        }
+
+        .left-feature-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* RIGHT PANEL */
+        .right-panel {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 80px;
+            overflow-y: auto;
+        }
+
+        .form-container { width: 100%; max-width: 480px; }
+
+        .form-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 36px;
+            letter-spacing: 0.5px;
+        }
+
+        /* TABS */
+        .reg-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            margin-bottom: 36px;
+        }
+
+        .reg-tab {
+            flex: 1;
+            padding: 14px 0;
+            text-align: center;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            margin-bottom: -1px;
+        }
+
+        .reg-tab.active {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+
+        /* FORM FIELDS */
+        .field-group { margin-bottom: 22px; }
+
+        .field-label {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1px solid rgba(201,168,76,0.25);
+            background: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--dark);
+            border-radius: 0;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .field-input:focus { border-color: var(--gold); }
+
+        .field-select {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1px solid rgba(201,168,76,0.25);
+            background: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--dark);
+            border-radius: 0;
+            outline: none;
+            transition: border-color 0.3s;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .field-select:focus { border-color: var(--gold); }
+
+        /* BUTTON */
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: var(--dark);
+            color: #fff;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover { background: var(--gold); color: var(--dark); }
+
+        /* ALERT */
+        .alert-box {
+            padding: 14px 18px;
+            font-size: 0.78rem;
+            margin-bottom: 24px;
+            display: none;
+            border-radius: 0;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            color: #166534;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .login-link a {
+            color: var(--gold-dark);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .login-link a:hover { text-decoration: underline; }
+
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .left-panel { width: 100%; min-height: 280px; padding: 40px; }
+            .right-panel { padding: 40px 30px; }
+        }
+    </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<div class="container mt-5">
-
-    <h2 class="text-center">📝 Register</h2>
-
-    <form action="/register" method="post" class="w-50 mx-auto mt-4">
-
-        <label>Name</label>
-        <input type="text" name="name" class="form-control mb-3" required>
-
-        <label>Email</label>
-        <input type="email" name="email" class="form-control mb-3" required>
-
-        <label>Password</label>
-        <input type="password" name="password" class="form-control mb-3" required>
-
-        <button class="btn btn-warning w-100">Register</button>
-
-    </form>
-
+<!-- LEFT PANEL -->
+<div class="left-panel">
+    <div class="left-panel-bg"></div>
+    <div class="left-panel-overlay"></div>
+    <a href="/" class="brand">✦ Wedding Planner</a>
+    <div class="left-content">
+        <div class="left-tag">Join Us Today</div>
+        <h2>Begin Your<br><em>Perfect</em><br>Journey</h2>
+        <p>Register today and get access to our exclusive network of vendors, venues, and wedding planning tools.</p>
+        <div class="left-divider"></div>
+        <div class="left-feature"><div class="left-feature-dot"></div> Access 120+ premium vendors</div>
+        <div class="left-feature"><div class="left-feature-dot"></div> Browse 50+ luxury venues</div>
+        <div class="left-feature"><div class="left-feature-dot"></div> Plan your perfect wedding day</div>
+        <div class="left-feature"><div class="left-feature-dot"></div> 24/7 dedicated support</div>
+    </div>
 </div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+    <div class="form-container">
+
+        <div class="form-title">Create Account</div>
+        <div class="form-subtitle">Choose your account type to get started</div>
+
+        <!-- TABS -->
+        <div class="reg-tabs">
+            <div class="reg-tab active" onclick="switchTab('user', this)">I'm a Couple</div>
+            <div class="reg-tab" onclick="switchTab('vendor', this)">I'm a Vendor</div>
+        </div>
+
+        <!-- ALERT BOX -->
+        <div class="alert-box alert-success" id="successAlert"></div>
+        <div class="alert-box alert-error" id="errorAlert"></div>
+
+        <!-- USER REGISTRATION FORM -->
+        <div class="form-section active" id="userForm">
+            <div class="field-group">
+                <label class="field-label">Full Name</label>
+                <input type="text" class="field-input" id="userFullName" placeholder="Enter your full name">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Email Address</label>
+                <input type="email" class="field-input" id="userEmail" placeholder="Enter your email">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Phone Number</label>
+                <input type="tel" class="field-input" id="userPhone" placeholder="Enter your phone number">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Password</label>
+                <input type="password" class="field-input" id="userPassword" placeholder="Create a password">
+            </div>
+            <button class="btn-submit" onclick="registerUser()">Create Account</button>
+        </div>
+
+        <!-- VENDOR REGISTRATION FORM -->
+        <div class="form-section" id="vendorForm">
+            <div class="field-group">
+                <label class="field-label">Business Name</label>
+                <input type="text" class="field-input" id="vendorName" placeholder="Enter your business name">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Email Address</label>
+                <input type="email" class="field-input" id="vendorEmail" placeholder="Enter your email">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Phone Number</label>
+                <input type="tel" class="field-input" id="vendorPhone" placeholder="Enter your phone number">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Category</label>
+                <select class="field-select" id="vendorCategory">
+                    <option value="">Select a category</option>
+                    <option value="PHOTOGRAPHY">Photography</option>
+                    <option value="HAIR_MAKEUP">Hair & Makeup</option>
+                    <option value="FOOD">Food & Beverages</option>
+                    <option value="DECOR">Decorations</option>
+                    <option value="CAKES">Cakes</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Password</label>
+                <input type="password" class="field-input" id="vendorPassword" placeholder="Create a password">
+            </div>
+            <button class="btn-submit" onclick="registerVendor()">Register as Vendor</button>
+        </div>
+
+        <div class="login-link">
+            Already have an account? <a href="/login.html">Sign in here</a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Switch between User and Vendor tabs
+    function switchTab(type, el) {
+        document.querySelectorAll('.reg-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+        document.getElementById(type + 'Form').classList.add('active');
+        hideAlerts();
+    }
+
+    function showSuccess(msg) {
+        const el = document.getElementById('successAlert');
+        el.textContent = msg;
+        el.style.display = 'block';
+        document.getElementById('errorAlert').style.display = 'none';
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('errorAlert');
+        el.textContent = msg;
+        el.style.display = 'block';
+        document.getElementById('successAlert').style.display = 'none';
+    }
+
+    function hideAlerts() {
+        document.getElementById('successAlert').style.display = 'none';
+        document.getElementById('errorAlert').style.display = 'none';
+    }
+
+    // Register User
+    function registerUser() {
+        const fullName = document.getElementById('userFullName').value.trim();
+        const email    = document.getElementById('userEmail').value.trim();
+        const phone    = document.getElementById('userPhone').value.trim();
+        const password = document.getElementById('userPassword').value.trim();
+
+        if (!fullName || !email || !phone || !password) {
+            showError('Please fill in all fields.');
+            return;
+        }
+
+        const params = new URLSearchParams({ fullName, email, password, phone });
+
+        fetch('/api/register/user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showSuccess('Registration successful! Redirecting to login...');
+                setTimeout(() => window.location.href = '/login.html', 2000);
+            } else {
+                showError(data.message);
+            }
+        })
+        .catch(() => showError('Something went wrong. Please try again.'));
+    }
+
+    // Register Vendor
+    function registerVendor() {
+        const businessName = document.getElementById('vendorName').value.trim();
+        const email        = document.getElementById('vendorEmail').value.trim();
+        const phone        = document.getElementById('vendorPhone').value.trim();
+        const category     = document.getElementById('vendorCategory').value;
+        const password     = document.getElementById('vendorPassword').value.trim();
+
+        if (!businessName || !email || !phone || !category || !password) {
+            showError('Please fill in all fields.');
+            return;
+        }
+
+        const params = new URLSearchParams({ businessName, email, password, phone, category });
+
+        fetch('/api/register/vendor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showSuccess('Vendor registered successfully! Redirecting to login...');
+                setTimeout(() => window.location.href = '/login.html', 2000);
+            } else {
+                showError(data.message);
+            }
+        })
+        .catch(() => showError('Something went wrong. Please try again.'));
+    }
+</script>
 
 </body>
 </html>
