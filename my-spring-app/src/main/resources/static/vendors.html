@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Our Curated Vendors | Wedding Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-light: #e8d5a3;
+            --gold-dark: #9a7a2e;
+            --cream: #fdf8f2;
+            --dark: #1a1209;
+            --text-muted: #7a6a50;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--dark);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+        }
+
+        /* ── GRAIN OVERLAY ── */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.4;
+        }
+
+        /* ── NAVBAR (Matching Index) ── */
+        .navbar {
+            background: rgba(26, 18, 9, 0.97) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            padding: 18px 40px;
+        }
+
+        .navbar-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: var(--gold) !important;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.75) !important;
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ── HEADER SECTION ── */
+        .vendor-header {
+            padding: 80px 0 40px;
+            text-align: center;
+        }
+
+        .section-tag {
+            font-size: 0.65rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .section-tag::before, .section-tag::after {
+            content: ''; height: 1px; width: 30px; background: var(--gold);
+        }
+
+        .page-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.5rem;
+            font-weight: 300;
+        }
+
+        .page-title em { color: var(--gold-dark); font-style: italic; }
+
+        /* ── CATEGORY HEADERS ── */
+        .category-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            margin-top: 50px;
+            color: var(--dark);
+        }
+
+        /* ── VENDOR CARDS ── */
+        .vendor-card {
+            background: #fff;
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 0;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .vendor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(26,18,9,0.08);
+            border-color: var(--gold);
+        }
+
+        .vendor-img {
+            height: 200px;
+            background-color: #eee;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .vendor-body {
+            padding: 25px;
+        }
+
+        .vendor-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .vendor-status {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gold-dark);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .btn-view {
+            border: 1px solid var(--gold);
+            color: var(--dark);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            border-radius: 0;
+            transition: all 0.3s;
+            width: 100%;
+            background: transparent;
+        }
+
+        .btn-view:hover {
+            background: var(--gold);
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">✦ Wedding Planner</a>
+        <div class="ms-auto d-flex gap-4">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/hotels">Hotels</a>
+            <a class="nav-link" href="/gallery">Gallery</a>
+            <a class="nav-link" href="/contact">Contact</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- Header -->
+    <header class="vendor-header">
+        <div class="section-tag">Elite Partners</div>
+        <h1 class="page-title">The <em>Vendor</em> Collective</h1>
+        <p class="text-muted">A handpicked selection of Sri Lanka's finest wedding professionals.</p>
+    </header>
+
+    <!-- Thymeleaf Loop -->
+    <div th:each="entry : ${groupedVendors}">
+
+        <h3 class="category-title" th:switch="${entry.key}">
+            <span th:case="'HAIR_MAKEUP'">💄 Hair & Artistry</span>
+            <span th:case="'PHOTOGRAPHY'">📸 Visual Storytellers</span>
+            <span th:case="'FOOD'">🍽️ Gourmet Catering</span>
+            <span th:case="'DECOR'">🎀 Event Design & Décor</span>
+            <span th:case="*">🎂 Confectionery & Cakes</span>
+        </h3>
+
+        <div class="row g-4">
+            <!-- Iterate over vendors in this category -->
+            <div class="col-md-4 col-sm-6" th:each="vendor : ${entry.value}">
+                <div class="vendor-card">
+                    <!-- Placeholder for Vendor Image (Ideally dynamic) -->
+                    <div class="vendor-img" style="background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=500')"></div>
+
+                    <div class="vendor-body">
+                        <span class="vendor-status">✦ Verified Partner</span>
+                        <h5 class="vendor-name" th:text="${vendor}">Vendor Name</h5>
+                        <p class="small text-muted mb-4">Specializing in bespoke wedding experiences and premium service.</p>
+                        <button class="btn btn-view">Inquire Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example of "Extra" Static Vendors (if your DB is empty) -->
+            <div class="col-md-4 col-sm-6" th:if="${entry.value.size() < 1}">
+                <div class="vendor-card">
+                    <div class="vendor-img" style="background-image: url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=500')"></div>
+                    <div class="vendor-body">
+                        <span class="vendor-status">✦ Featured</span>
+                        <h5 class="vendor-name">Luxury Decorators Ltd</h5>
+                        <p class="small text-muted mb-4">Premium floral and set design for grand celebrations.</p>
+                        <button class="btn btn-view">Inquire Now</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<footer style="margin-top: 100px; padding: 40px; text-align: center; border-top: 1px solid rgba(201,168,76,0.1);">
+    <p class="small text-muted">© 2024 Wedding Planner System. All Rights Reserved.</p>
+</footer>
+
+</body>
+</html>

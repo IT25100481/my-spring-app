@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Admin Panel</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-4">
+
+    <h1 class="text-center mb-4">⚙️ Admin Vendor Panel</h1>
+
+    <a href="/" class="btn btn-secondary mb-3">Home</a>
+
+    <!-- ADD FORM -->
+    <div class="card p-3 mb-4 shadow">
+        <h4>Add Vendor</h4>
+
+        <form action="/admin/add" method="post" class="row g-2">
+
+            <div class="col-md-3">
+                <input class="form-control" name="category" placeholder="Category">
+            </div>
+
+            <div class="col-md-4">
+                <input class="form-control" name="name" placeholder="Name">
+            </div>
+
+            <div class="col-md-3">
+                <input class="form-control" name="price" placeholder="Price">
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-success w-100">Add</button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- VENDOR LIST -->
+    <div class="row">
+
+        <div class="col-md-4 mb-3" th:each="vendor : ${vendors}">
+
+            <div class="card p-3 shadow">
+
+                <p th:text="${vendor}"></p>
+
+                <a th:href="@{'/admin/delete'(data=${vendor})}">
+                    <button class="btn btn-danger w-100 mb-2">Delete</button>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

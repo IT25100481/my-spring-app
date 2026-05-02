@@ -1,14 +1,794 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>My Spring App</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/833/833472.png">
+    <title>Wedding Planner System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-light: #e8d5a3;
+            --gold-dark: #9a7a2e;
+            --cream: #fdf8f2;
+            --dark: #1a1209;
+            --dark-mid: #2e2010;
+            --text-muted: #7a6a50;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--cream);
+            color: var(--dark);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            overflow-x: hidden;
+        }
+
+        /* ── GRAIN OVERLAY ── */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.4;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background: rgba(26, 18, 9, 0.97) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            padding: 18px 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: var(--gold) !important;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.75) !important;
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 400;
+            padding: 6px 0 !important;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover { color: var(--gold) !important; }
+        .nav-link:hover::after { width: 100%; }
+
+        .btn-login {
+            border: 1px solid rgba(201,168,76,0.5);
+            color: var(--gold) !important;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px 20px;
+            border-radius: 0;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-login:hover {
+            background: rgba(201,168,76,0.1);
+            border-color: var(--gold);
+        }
+
+        .btn-register {
+            background: var(--gold);
+            color: var(--dark) !important;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px 22px;
+            border-radius: 0;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: 1px solid var(--gold);
+        }
+
+        .btn-register:hover {
+            background: var(--gold-dark);
+            border-color: var(--gold-dark);
+        }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 92vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=1600') center/cover no-repeat;
+            transform: scale(1.05);
+            animation: slowZoom 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes slowZoom {
+            from { transform: scale(1.05); }
+            to   { transform: scale(1.12); }
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(26,18,9,0.88) 0%,
+                rgba(26,18,9,0.6) 50%,
+                rgba(26,18,9,0.75) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 80px;
+            max-width: 720px;
+            animation: fadeUp 1.2s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-tag {
+            font-size: 0.68rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hero-tag::before, .hero-tag::after {
+            content: '';
+            height: 1px;
+            width: 40px;
+            background: var(--gold);
+            opacity: 0.6;
+        }
+
+        .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            font-weight: 300;
+            line-height: 1.1;
+            color: #fff;
+            margin-bottom: 28px;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--gold-light);
+        }
+
+        .hero p {
+            font-size: 0.9rem;
+            line-height: 1.9;
+            color: rgba(255,255,255,0.65);
+            max-width: 480px;
+            margin-bottom: 48px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn-primary-gold {
+            background: var(--gold);
+            color: var(--dark);
+            font-size: 0.72rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 16px 40px;
+            border-radius: 0;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-primary-gold:hover {
+            background: var(--gold-dark);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-gold {
+            border: 1px solid rgba(255,255,255,0.4);
+            color: rgba(255,255,255,0.8);
+            font-size: 0.72rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 16px 40px;
+            border-radius: 0;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-outline-gold:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            background: var(--dark);
+            padding: 28px 80px;
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 1px solid rgba(201,168,76,0.15);
+        }
+
+        .stat-item {
+            text-align: center;
+            animation: fadeUp 1s ease both;
+        }
+
+        .stat-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.4rem;
+            color: var(--gold);
+            font-weight: 300;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.45);
+            margin-top: 6px;
+        }
+
+        /* ── SECTION BASE ── */
+        .section {
+            padding: 100px 80px;
+        }
+
+        .section-tag {
+            font-size: 0.65rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-tag::before {
+            content: '';
+            height: 1px;
+            width: 30px;
+            background: var(--gold);
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 300;
+            line-height: 1.2;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+
+        .section-title em {
+            font-style: italic;
+            color: var(--gold-dark);
+        }
+
+        .section-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.9;
+            max-width: 500px;
+        }
+
+        /* ── SERVICES ── */
+        .services-section {
+            background: var(--cream);
+        }
+
+        .service-card {
+            border: 1px solid rgba(201,168,76,0.2);
+            padding: 48px 36px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 2px;
+            background: var(--gold);
+            transition: width 0.4s ease;
+        }
+
+        .service-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(26,18,9,0.1); }
+        .service-card:hover::before { width: 100%; }
+
+        .service-icon {
+            font-size: 2rem;
+            margin-bottom: 24px;
+            display: block;
+        }
+
+        .service-card h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--dark);
+            margin-bottom: 14px;
+        }
+
+        .service-card p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        /* ── GALLERY ── */
+        .gallery-section {
+            background: var(--dark);
+            padding: 100px 80px;
+        }
+
+        .gallery-section .section-title { color: #fff; }
+        .gallery-section .section-sub { color: rgba(255,255,255,0.45); }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-rows: 260px 260px;
+            gap: 12px;
+            margin-top: 60px;
+        }
+
+        .gallery-item {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .gallery-item:first-child {
+            grid-row: 1 / 3;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+            border-radius: 0;
+        }
+
+        .gallery-item:hover img { transform: scale(1.08); }
+
+        .gallery-item-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(26,18,9,0);
+            transition: background 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gallery-item:hover .gallery-item-overlay {
+            background: rgba(26,18,9,0.4);
+        }
+
+        .gallery-item-overlay span {
+            color: #fff;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s;
+        }
+
+        .gallery-item:hover .gallery-item-overlay span {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── TESTIMONIAL ── */
+        .testimonial-section {
+            background: #fff;
+            padding: 100px 80px;
+            text-align: center;
+        }
+
+        .quote-mark {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 6rem;
+            color: var(--gold-light);
+            line-height: 0.5;
+            margin-bottom: 32px;
+        }
+
+        .testimonial-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            font-style: italic;
+            color: var(--dark-mid);
+            max-width: 700px;
+            margin: 0 auto 32px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .testimonial-author {
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+        }
+
+        /* ── CTA SECTION ── */
+        .cta-section {
+            background: var(--dark);
+            padding: 100px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1507504031003-b417219a0fde?w=1200') center/cover;
+            opacity: 0.08;
+        }
+
+        .cta-section .section-tag { justify-content: center; }
+        .cta-section .section-tag::before { display: none; }
+        .cta-section .section-tag::after {
+            content: '';
+            height: 1px;
+            width: 30px;
+            background: var(--gold);
+        }
+
+        .cta-section .section-title { color: #fff; text-align: center; }
+
+        .cta-section p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+            margin-bottom: 48px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #0e0b06;
+            padding: 60px 80px 30px;
+            border-top: 1px solid rgba(201,168,76,0.1);
+        }
+
+        .footer-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--gold);
+            letter-spacing: 3px;
+            font-weight: 300;
+            margin-bottom: 12px;
+        }
+
+        .footer-tagline {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .footer-link {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.45);
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .footer-link:hover { color: var(--gold); }
+
+        .footer-heading {
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.06);
+            margin-top: 48px;
+            padding-top: 24px;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 1px;
+        }
+
+        /* ── DIVIDER ── */
+        .gold-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 0 auto 60px;
+            max-width: 200px;
+            justify-content: center;
+        }
+
+        .gold-divider span {
+            height: 1px;
+            flex: 1;
+            background: var(--gold);
+            opacity: 0.4;
+        }
+
+        .gold-divider i { color: var(--gold); font-size: 0.6rem; }
+
+        @media (max-width: 768px) {
+            .hero-content { padding: 0 30px; }
+            .section { padding: 70px 30px; }
+            .gallery-section { padding: 70px 30px; }
+            .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+            .gallery-item:first-child { grid-row: auto; }
+            .stats-bar { padding: 24px 20px; flex-wrap: wrap; gap: 24px; }
+            .cta-section { padding: 70px 30px; }
+            footer { padding: 50px 30px 24px; }
+        }
+    </style>
 </head>
+
 <body>
-<h1>Welcome</h1>
-<button id="btn">Fetch Message</button>
-<p id="result"></p>
-<script src="app.js"></script>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="/">✦ Wedding Planner</a>
+    <div class="ms-auto d-flex align-items-center gap-4">
+        <div class="d-flex gap-4 d-none d-lg-flex">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/vendors.html">Vendors</a>
+            <a class="nav-link" href="/hotels.html">Hotels</a>
+            <a class="nav-link" href="/gallery.html">Gallery</a>
+            <a class="nav-link" href="/about.html">About</a>
+            <a class="nav-link" href="/contact.html">Contact</a>
+        </div>
+        <div class="d-flex gap-2 ms-3">
+            <a href="/login.html" class="btn-login">Login</a>
+            <a href="/register.html" class="btn-register">Register</a>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="hero-tag">Est. 2024 &nbsp;•&nbsp; Premier Wedding Services</div>
+        <h1>Your Dream<br><em>Wedding</em><br>Begins Here</h1>
+        <p>From intimate ceremonies to grand celebrations — curated vendors, exquisite venues, and unforgettable memories crafted with love and elegance.</p>
+        <div class="hero-cta">
+            <a href="/register.html" class="btn-primary-gold">Begin Planning</a>
+            <a href="/gallery.html" class="btn-outline-gold">View Gallery</a>
+        </div>
+    </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+    <div class="stat-item">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">Weddings Planned</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">120+</div>
+        <div class="stat-label">Trusted Vendors</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">50+</div>
+        <div class="stat-label">Premium Venues</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">98%</div>
+        <div class="stat-label">Happy Couples</div>
+    </div>
+</div>
+
+<!-- SERVICES -->
+<section class="section services-section">
+    <div class="container-fluid px-0">
+        <div class="row align-items-end mb-5">
+            <div class="col-lg-5">
+                <div class="section-tag">What We Offer</div>
+                <h2 class="section-title">Crafting <em>Perfect</em><br>Moments</h2>
+            </div>
+            <div class="col-lg-5 offset-lg-2">
+                <p class="section-sub">Every detail matters. We bring together the finest vendors, venues, and services to create a wedding that reflects your unique love story.</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="service-card">
+                    <span class="service-icon">💍</span>
+                    <h4>Venue Selection</h4>
+                    <p>Discover handpicked venues — from grand ballrooms to intimate garden settings — perfectly matched to your vision and guest count.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <span class="service-icon">🌸</span>
+                    <h4>Floral & Décor</h4>
+                    <p>Breathtaking floral arrangements and décor crafted by our expert designers to transform your venue into a fairytale setting.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <span class="service-icon">📸</span>
+                    <h4>Photography</h4>
+                    <p>Award-winning photographers who capture every precious moment — from the first look to the last dance — with artistic mastery.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <span class="service-icon">🍽️</span>
+                    <h4>Catering</h4>
+                    <p>Exquisite culinary experiences with customised menus, master chefs, and impeccable service for an unforgettable dining experience.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <span class="service-icon">🎵</span>
+                    <h4>Entertainment</h4>
+                    <p>Live bands, DJs, and performers curated to set the perfect tone — from the ceremony to the last dance of the night.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <span class="service-icon">✈️</span>
+                    <h4>Honeymoon</h4>
+                    <p>Begin your new chapter with a perfectly planned honeymoon — from exotic destinations to intimate getaways tailored just for you.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery-section">
+    <div class="section-tag">Our Portfolio</div>
+    <h2 class="section-title" style="color:#fff;">Moments <em style="color:var(--gold-light)">Captured</em></h2>
+    <div class="gallery-grid">
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800" alt="Wedding">
+            <div class="gallery-item-overlay"><span>View More</span></div>
+        </div>
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600" alt="Ceremony">
+            <div class="gallery-item-overlay"><span>Ceremony</span></div>
+        </div>
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1507504031003-b417219a0fde?w=600" alt="Reception">
+            <div class="gallery-item-overlay"><span>Reception</span></div>
+        </div>
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600" alt="Decor">
+            <div class="gallery-item-overlay"><span>Décor</span></div>
+        </div>
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600" alt="Flowers">
+            <div class="gallery-item-overlay"><span>Florals</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testimonial-section">
+    <div class="gold-divider"><span></span>✦<span></span></div>
+    <div class="quote-mark">"</div>
+    <p class="testimonial-text">They turned our dream into reality. Every single detail was perfect — from the flowers to the final dance. We couldn't have imagined a more magical day.</p>
+    <div class="testimonial-author">— Priya & Arjun, Colombo 2024</div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div style="position:relative;z-index:2;">
+        <div class="section-tag" style="justify-content:center;">Start Your Journey</div>
+        <h2 class="section-title" style="max-width:600px;margin:0 auto 24px;">Let Us Create Your <em>Perfect Day</em></h2>
+        <p>Every love story is unique. Let us help you tell yours.</p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="/register.html" class="btn-primary-gold">Get Started</a>
+            <a href="/vendors.html" class="btn-outline-gold">Explore Vendors</a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="row">
+        <div class="col-lg-4 mb-5 mb-lg-0">
+            <div class="footer-brand">✦ Wedding Planner</div>
+            <div class="footer-tagline">Creating unforgettable moments</div>
+        </div>
+        <div class="col-lg-2 col-6 mb-4">
+            <div class="footer-heading">Navigate</div>
+            <a href="/" class="footer-link">Home</a>
+            <a href="/vendors.html" class="footer-link">Vendors</a>
+            <a href="/hotels.html" class="footer-link">Hotels</a>
+            <a href="/gallery.html" class="footer-link">Gallery</a>
+        </div>
+        <div class="col-lg-2 col-6 mb-4">
+            <div class="footer-heading">Company</div>
+            <a href="/about.html" class="footer-link">About Us</a>
+            <a href="/contact.html" class="footer-link">Contact</a>
+            <a href="/register.html" class="footer-link">Register</a>
+            <a href="/login.html" class="footer-link">Login</a>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="footer-heading">Contact Us</div>
+            <p class="footer-link">📍 Colombo, Sri Lanka</p>
+            <p class="footer-link">📞 +94 11 234 5678</p>
+            <p class="footer-link">✉️ hello@weddingplanner.lk</p>
+        </div>
+    </div>
+    <div class="footer-bottom d-flex justify-content-between">
+        <span>© 2024 Wedding Planner. All rights reserved.</span>
+        <span>Crafted with ♥ in Sri Lanka</span>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+```

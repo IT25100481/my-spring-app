@@ -1,0 +1,27 @@
+<!-- Login Page -->
+<style>
+    .auth-box {
+        max-width: 450px;
+        margin: 100px auto;
+        background: #fff;
+        padding: 50px;
+        border: 1px solid rgba(201,168,76,0.2);
+    }
+    .form-control {
+        border-radius: 0;
+        border: 1px solid #e2e2e2;
+        padding: 12px;
+    }
+    .form-control:focus { border-color: var(--gold); box-shadow: none; }
+</style>
+<div class="container">
+    <div class="auth-box text-center">
+        <h2 style="font-family: 'Cormorant Garamond', serif; margin-bottom: 30px;">Welcome <em>Back</em></h2>
+        <form>
+            <input type="email" class="form-control mb-3" placeholder="Email Address">
+            <input type="password" class="form-control mb-4" placeholder="Password">
+            <button class="btn btn-dark w-100 py-3 mb-3" style="border-radius:0; background: var(--dark);">Sign In</button>
+            <a href="/register" class="small text-muted" style="text-decoration:none">Don't have an account? <span style="color:var(--gold)">Register</span></a>
+        </form>
+    </div>
+</div>
