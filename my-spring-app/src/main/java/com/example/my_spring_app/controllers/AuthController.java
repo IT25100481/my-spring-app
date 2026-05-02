@@ -126,7 +126,7 @@ public class AuthController {
             User user = authService.authenticateUser(request.getEmail(), request.getPassword());
 
             // Generate JWT token
-            String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
+            String token = jwtTokenProvider.generateTokenFromUser(user);
 
             // Create response
             AuthResponse.UserInfo userInfo = new AuthResponse.UserInfo(

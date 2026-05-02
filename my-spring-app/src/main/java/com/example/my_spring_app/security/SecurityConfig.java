@@ -57,8 +57,21 @@ public class SecurityConfig {
             .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/register.html", "/login.html", "/index.html", "/vendors.html").permitAll()
-                .requestMatchers("/static/**", "/categories.txt").permitAll()
+                .requestMatchers(
+                        "/",
+                        "/index.html",
+                        "/login.html",
+                        "/register.html",
+                        "/vendors.html",
+                        "/categories.txt",
+                        "/**/*.css",
+                        "/**/*.js",
+                        "/**/*.png",
+                        "/**/*.jpg",
+                        "/**/*.jpeg",
+                        "/**/*.svg",
+                        "/**/*.ico"
+                ).permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/vendor/**").hasRole("VENDOR")
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")

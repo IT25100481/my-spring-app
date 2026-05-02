@@ -3,7 +3,6 @@ package com.example.my_spring_app;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,7 +42,7 @@ public class RegistrationController {
                     .body(Map.of("status", "success",
                             "message", "User registered successfully!"));
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(Map.of("status", "error",
                             "message", "Something went wrong. Try again."));
@@ -75,7 +74,7 @@ public class RegistrationController {
                     .body(Map.of("status", "success",
                             "message", "Vendor registered successfully!"));
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(Map.of("status", "error",
                             "message", "Something went wrong. Try again."));
@@ -88,15 +87,15 @@ public class RegistrationController {
         try {
             Path path = Paths.get("categories.txt");
             if (!Files.exists(path)) {
-                return ResponseEntity.ok("")
+                return ResponseEntity.ok()
                         .header("Content-Type", "text/plain")
-                        .build();
+                        .body("");
             }
             String content = Files.readString(path);
             return ResponseEntity.ok()
                     .header("Content-Type", "text/plain")
                     .body(content);
-        } catch (IOException e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .header("Content-Type", "text/plain")
                     .body("");
