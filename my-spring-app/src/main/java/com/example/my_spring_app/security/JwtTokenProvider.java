@@ -1,0 +1,66 @@
+package com.example.my_spring_app.security;
+
+import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+
+@Component
+public class JwtTokenProvider {
+
+    @Value("${jwt.secret:your_super_secret_key_that_should_be_at_least_256_bits_long_for_security}")
+    private String jwtSecret;
+
+    @Value("${jwt.expiration:86400000}")
+    private int jwtExpiration;
+
+    public String generateToken(Authentication authentication) {
+        return generateTokenFromEmail(authentication.getName());
+    }
+
+    public String generateTokenFromEmail(String email) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpiration);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret.getBytes(StandardCharsets.UTF_8))
+                .compact();
+    }
+
+    public String getUserEmailFromToken(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(jwtSecret)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (JwtException | IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .setSigningKey(jwtSecret)
+                    .parseClaimsJws(token);
+            return true;
+        } catch (SecurityException e) {
+            System.err.println("Invalid JWT signature: " + e);
+        } catch (MalformedJwtException e) {
+            System.err.println("Invalid JWT token: " + e);
+        } catch (ExpiredJwtException e) {
+            System.err.println("Expired JWT token: " + e);
+        } catch (UnsupportedJwtException e) {
+            System.err.println("Unsupported JWT token: " + e);
+        } catch (IllegalArgumentException e) {
+            System.err.println("JWT claims string is empty: " + e);
+        }
+        return false;
+    }
+}

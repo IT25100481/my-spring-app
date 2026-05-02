@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Notifications | Wedding Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --gold:#c9a84c; --cream:#fdf8f2; --dark:#1a1209; --text-muted:#7a6a50; }
+        body { background: var(--cream); color: var(--dark); font-family: Montserrat, sans-serif; }
+        .panel { background:#fff; border:1px solid rgba(201,168,76,.15); padding:24px; }
+        .small-muted { color: var(--text-muted); font-size: .9rem; }
+        .note { border:1px solid rgba(201,168,76,.15); padding:14px; margin-bottom:10px; background:#fff; }
+        .btn-dark { background:var(--dark); border-color:var(--dark); border-radius:0; }
+        .btn-outline-dark { border-radius:0; }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <div class="text-uppercase" style="letter-spacing:5px;color:var(--gold);font-size:.65rem;">Alerts</div>
+            <h1 class="display-6" style="font-family:Georgia,serif;">Notifications</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-dark" href="/vendor/dashboard">Dashboard</a>
+            <button class="btn btn-dark" onclick="loadNotifications()">Reload</button>
+        </div>
+    </div>
+    <div id="messageBox" class="alert d-none"></div>
+    <div class="panel mb-4"><strong>Unread:</strong> <span id="unreadCount">0</span></div>
+    <div class="panel"><div id="notificationsList"></div></div>
+</div>
+<script>
+    const email = localStorage.getItem('userEmail') || '';
+    function showMessage(message, type='success') { const box=document.getElementById('messageBox'); box.className=`alert alert-${type}`; box.textContent=message; box.classList.remove('d-none'); }
+    function loadNotifications() {
+        fetch(`/api/notifications?email=${encodeURIComponent(email)}`)
+            .then(r => r.json())
+            .then(items => {
+                const list = document.getElementById('notificationsList'); list.innerHTML='';
+                if (!items.length) { list.innerHTML = '<p class="small-muted mb-0">No notifications found.</p>'; }
+                items.forEach(n => {
+                    const div = document.createElement('div');
+                    div.className='note';
+                    div.innerHTML = `<strong>${n.title || ''}</strong><div class="small-muted">${n.message || ''}</div><div class="small-muted">${n.createdAt || ''}</div><div class="mt-2"><button class="btn btn-outline-dark btn-sm" onclick="markRead(${n.id})">Mark Read</button></div>`;
+                    list.appendChild(div);
+                });
+            });
+        fetch(`/api/notifications/unread-count?email=${encodeURIComponent(email)}`)
+            .then(r => r.json())
+            .then(data => { document.getElementById('unreadCount').textContent = data.count ?? 0; });
+    }
+    function markRead(id) {
+        fetch(`/api/notifications/${id}/read?email=${encodeURIComponent(email)}`, { method:'PUT' })
+            .then(r => r.json())
+            .then(() => { showMessage('Notification marked as read.'); loadNotifications(); })
+            .catch(() => showMessage('Could not update notification.', 'danger'));
+    }
+    loadNotifications();
+</script>
+</body>
+</html>

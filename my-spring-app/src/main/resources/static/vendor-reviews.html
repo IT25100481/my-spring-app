@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Reviews | Wedding Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --gold:#c9a84c; --cream:#fdf8f2; --dark:#1a1209; --text-muted:#7a6a50; }
+        body { background: var(--cream); color: var(--dark); font-family: Montserrat, sans-serif; }
+        .panel { background:#fff; border:1px solid rgba(201,168,76,.15); padding:24px; }
+        .small-muted { color: var(--text-muted); font-size: .9rem; }
+        .field-input, .field-textarea { width:100%; border:1px solid #d8d1c4; padding:10px 12px; margin-bottom:12px; }
+        .field-textarea { min-height:90px; }
+        .review { border:1px solid rgba(201,168,76,.15); padding:14px; margin-bottom:10px; background:#fff; }
+        .btn-dark { background:var(--dark); border-color:var(--dark); border-radius:0; }
+        .btn-outline-dark { border-radius:0; }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <div class="text-uppercase" style="letter-spacing:5px;color:var(--gold);font-size:.65rem;">Reviews</div>
+            <h1 class="display-6" style="font-family:Georgia,serif;">Customer Reviews</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-dark" href="/vendor/dashboard">Dashboard</a>
+            <button class="btn btn-dark" onclick="loadReviews()">Reload</button>
+        </div>
+    </div>
+    <div id="messageBox" class="alert d-none"></div>
+    <div class="row g-4">
+        <div class="col-lg-12">
+            <div class="panel">
+                <div id="reviewsList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const email = localStorage.getItem('userEmail') || '';
+    function showMessage(message, type='success') { const box=document.getElementById('messageBox'); box.className=`alert alert-${type}`; box.textContent=message; box.classList.remove('d-none'); }
+    function loadReviews() {
+        fetch(`/api/vendor/reviews?email=${encodeURIComponent(email)}`)
+            .then(r => r.json())
+            .then(items => {
+                const list = document.getElementById('reviewsList'); list.innerHTML='';
+                if (!items.length) { list.innerHTML = '<p class="small-muted mb-0">No reviews found.</p>'; return; }
+                items.forEach(r => {
+                    const div = document.createElement('div');
+                    div.className='review';
+                    div.innerHTML = `<strong>Rating: ${r.rating || ''}/5</strong><div class="small-muted">${r.reviewText || ''}</div><div class="small-muted">Response: ${r.vendorResponse || 'No response yet'}</div><div class="mt-2 d-flex gap-2 flex-wrap"><button class="btn btn-outline-dark btn-sm" onclick="respondReview(${r.id})">Respond</button><button class="btn btn-outline-dark btn-sm" onclick="flagReview(${r.id})">Flag</button></div>`;
+                    list.appendChild(div);
+                });
+            })
+            .catch(() => showMessage('Could not load reviews.', 'danger'));
+    }
+    function respondReview(id) {
+        const response = prompt('Response to review:');
+        if (!response) return;
+        fetch(`/api/vendor/reviews/${id}/respond?email=${encodeURIComponent(email)}&response=${encodeURIComponent(response)}`, { method:'POST' })
+            .then(r => r.json())
+            .then(() => { showMessage('Response saved.'); loadReviews(); })
+            .catch(() => showMessage('Could not respond to review.', 'danger'));
+    }
+    function flagReview(id) {
+        const reason = prompt('Reason for flagging:');
+        fetch(`/api/vendor/reviews/${id}/flag?email=${encodeURIComponent(email)}&reason=${encodeURIComponent(reason || '')}`, { method:'POST' })
+            .then(r => r.json())
+            .then(() => { showMessage('Review flagged.'); loadReviews(); })
+            .catch(() => showMessage('Could not flag review.', 'danger'));
+    }
+    loadReviews();
+</script>
+</body>
+</html>

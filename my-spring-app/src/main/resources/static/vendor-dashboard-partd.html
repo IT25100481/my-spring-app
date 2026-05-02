@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Dashboard — Partd | Wedding Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --cream: #fdf8f2;
+            --dark: #1a1209;
+            --text-muted: #7a6a50;
+        }
+        body {
+            background: var(--cream);
+            color: var(--dark);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+        }
+        .navbar {
+            background: rgba(26, 18, 9, 0.97);
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            padding: 18px 40px;
+        }
+        .navbar-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: var(--gold) !important;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .page-section {
+            padding: 80px 0 40px;
+            text-align: center;
+        }
+        .section-tag {
+            color: var(--gold);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            margin-bottom: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .page-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+        .card-panel {
+            background: #fff;
+            border: 1px solid rgba(201,168,76,0.15);
+            padding: 30px;
+            border-radius: 0;
+            transition: all 0.3s ease;
+        }
+        .card-panel:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(26,18,9,0.06);
+        }
+        footer {
+            margin-top: 80px;
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid rgba(201,168,76,0.1);
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">✦ Wedding Planner</a>
+        <div class="ms-auto d-flex gap-4 align-items-center">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/hotels">Hotels</a>
+            <a class="nav-link" href="/gallery">Gallery</a>
+            <a class="nav-link" href="/contact">Contact</a>
+            <a class="nav-link" href="/vendor/dashboard">Vendor Dashboard</a>
+            <a class="nav-link active" href="/vendor/dashboard/partd">Partd</a>
+            <a class="btn btn-outline-light btn-sm" href="/logout">Logout</a>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <section class="page-section">
+        <div class="section-tag">Vendor Dashboard</div>
+        <h1 class="page-title">Partd Section</h1>
+        <p class="text-muted">A dedicated space for your vendor-specific Partd management actions.</p>
+    </section>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card-panel">
+                <h3>Partd Overview</h3>
+                <p>Browse and manage your Partd items directly from this dashboard area.</p>
+                <p class="text-muted">Add new content, edit existing entries, or update part details.</p>
+                <a class="btn btn-dark" href="#">Create New Partd</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card-panel">
+                <h3>Current Partd Items</h3>
+                <p>Track and organize services that belong to the vendor Partd category.</p>
+                <p class="text-muted">This placeholder page can be expanded into a full admin panel.</p>
+                <a class="btn btn-outline-dark" href="/vendor/dashboard">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+<footer>
+    <p class="small text-muted">© 2026 Wedding Planner System. All Rights Reserved.</p>
+</footer>
+</body>
+</html>

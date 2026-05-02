@@ -1,0 +1,5 @@
+
+HAIR_MAKEUP:Hair & Makeup
+FOOD:Food & Beverages
+DECOR:Decorations
+CAKES:Cakes

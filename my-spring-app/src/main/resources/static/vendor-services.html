@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Services | Wedding Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #c9a84c; --cream: #fdf8f2; --dark: #1a1209; --text-muted: #7a6a50; }
+        body { background: var(--cream); color: var(--dark); font-family: 'Montserrat', sans-serif; }
+        .hero { padding: 70px 0 30px; text-align: center; }
+        .tag { color: var(--gold); letter-spacing: 5px; text-transform: uppercase; font-size: 0.65rem; }
+        .title { font-family: 'Cormorant Garamond', serif; font-size: 3.2rem; font-weight: 300; }
+        .panel { background: #fff; border: 1px solid rgba(201,168,76,0.15); padding: 28px; height: 100%; }
+        .field-label { font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+        .field-input, .field-select, .field-textarea { width: 100%; border: 1px solid #d8d1c4; padding: 12px 14px; margin-bottom: 18px; background: #fff; }
+        .field-textarea { min-height: 100px; }
+        .btn-dark { background: var(--dark); border-color: var(--dark); border-radius: 0; }
+        .btn-outline-dark { border-radius: 0; }
+        .list-card { border: 1px solid rgba(201,168,76,0.15); background: #fff; padding: 18px; margin-bottom: 12px; }
+        .small-muted { color: var(--text-muted); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <section class="hero">
+        <div class="tag">Service & Package Management</div>
+        <h1 class="title">Manage Your Offerings</h1>
+        <p class="small-muted">Create, edit, delete, and toggle services and pricing packages.</p>
+        <div class="d-flex justify-content-center gap-2 mt-3">
+            <a class="btn btn-outline-dark" href="/vendor/dashboard">Back to Dashboard</a>
+            <button class="btn btn-dark" onclick="loadServices()">Reload</button>
+        </div>
+    </section>
+
+    <div id="messageBox" class="alert d-none"></div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-5">
+            <div class="panel">
+                <h3 class="mb-4" style="font-family:'Cormorant Garamond', serif;">Create Service</h3>
+                <form id="serviceForm">
+                    <label class="field-label">Service Name</label>
+                    <input class="field-input" id="serviceName" type="text">
+                    <label class="field-label">Description</label>
+                    <textarea class="field-textarea" id="serviceDescription"></textarea>
+                    <label class="field-label">Base Price</label>
+                    <input class="field-input" id="servicePrice" type="number" step="0.01">
+                    <label class="field-label">Minimum Booking Notice Days</label>
+                    <input class="field-input" id="serviceNotice" type="number" value="7">
+                    <label class="field-label">Service Image URL</label>
+                    <input class="field-input" id="serviceImage" type="text">
+                    <label class="field-label">Availability</label>
+                    <select class="field-select" id="serviceAvailable">
+                        <option value="true">Available</option>
+                        <option value="false">Unavailable</option>
+                    </select>
+                    <button type="button" class="btn btn-dark" onclick="createService()">Save Service</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="panel">
+                <h3 class="mb-4" style="font-family:'Cormorant Garamond', serif;">Your Services</h3>
+                <div id="servicesList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function showMessage(message, type = 'success') {
+        const box = document.getElementById('messageBox');
+        box.className = `alert alert-${type}`;
+        box.textContent = message;
+        box.classList.remove('d-none');
+    }
+
+    function getEmail() {
+        return localStorage.getItem('userEmail') || '';
+    }
+
+    function loadServices() {
+        const email = getEmail();
+        if (!email) {
+            showMessage('Please login first. No email found in localStorage.', 'warning');
+            return;
+        }
+
+        fetch(`/api/vendor/services?email=${encodeURIComponent(email)}`)
+            .then(response => response.json())
+            .then(services => {
+                const list = document.getElementById('servicesList');
+                list.innerHTML = '';
+
+                if (!services.length) {
+                    list.innerHTML = '<p class="small-muted mb-0">No services added yet.</p>';
+                    return;
+                }
+
+                services.forEach(service => {
+                    const element = document.createElement('div');
+                    element.className = 'list-card';
+                    element.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                            <div>
+                                <h5 class="mb-1">${service.serviceName}</h5>
+                                <div class="small-muted">${service.description || ''}</div>
+                                <div class="small-muted">Price: ${service.basePrice}</div>
+                                <div class="small-muted">Notice: ${service.minimumBookingNoticeDays || 7} days</div>
+                                <div class="small-muted">Status: ${service.isAvailable ? 'Available' : 'Unavailable'}</div>
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button class="btn btn-outline-dark btn-sm" onclick="toggleService(${service.id}, ${!service.isAvailable})">Toggle</button>
+                                <button class="btn btn-outline-dark btn-sm" onclick="deleteService(${service.id})">Delete</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row g-2">
+                            <div class="col-md-4"><input class="field-input mb-0" id="pkgType-${service.id}" placeholder="BASIC / PREMIUM / CUSTOM"></div>
+                            <div class="col-md-4"><input class="field-input mb-0" id="pkgName-${service.id}" placeholder="Package name"></div>
+                            <div class="col-md-4"><input class="field-input mb-0" id="pkgPrice-${service.id}" type="number" step="0.01" placeholder="Price"></div>
+                            <div class="col-12"><input class="field-input mb-0" id="pkgInclusions-${service.id}" placeholder="Inclusions"></div>
+                            <div class="col-12"><input class="field-input mb-0" id="pkgExclusions-${service.id}" placeholder="Exclusions"></div>
+                            <div class="col-12"><textarea class="field-textarea mb-0" id="pkgDescription-${service.id}" placeholder="Description"></textarea></div>
+                            <div class="col-12"><button class="btn btn-dark btn-sm" onclick="createPackage(${service.id})">Add Package</button></div>
+                        </div>
+                    `;
+                    list.appendChild(element);
+                });
+            })
+            .catch(() => showMessage('Could not load services.', 'danger'));
+    }
+
+    function createService() {
+        const email = getEmail();
+        const payload = {
+            serviceName: document.getElementById('serviceName').value,
+            description: document.getElementById('serviceDescription').value,
+            basePrice: Number(document.getElementById('servicePrice').value),
+            minimumBookingNoticeDays: Number(document.getElementById('serviceNotice').value),
+            serviceImageUrl: document.getElementById('serviceImage').value,
+            isAvailable: document.getElementById('serviceAvailable').value === 'true'
+        };
+
+        fetch(`/api/vendor/services?email=${encodeURIComponent(email)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(() => {
+                showMessage('Service saved successfully.', 'success');
+                document.getElementById('serviceForm').reset();
+                loadServices();
+            })
+            .catch(() => showMessage('Could not save service.', 'danger'));
+    }
+
+    function deleteService(serviceId) {
+        const email = getEmail();
+        fetch(`/api/vendor/services/${serviceId}?email=${encodeURIComponent(email)}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(() => {
+                showMessage('Service deleted.', 'success');
+                loadServices();
+            })
+            .catch(() => showMessage('Could not delete service.', 'danger'));
+    }
+
+    function toggleService(serviceId, isAvailable) {
+        const email = getEmail();
+        fetch(`/api/vendor/services/${serviceId}/availability?email=${encodeURIComponent(email)}&isAvailable=${isAvailable}`, { method: 'PATCH' })
+            .then(response => response.json())
+            .then(() => {
+                showMessage('Service availability updated.', 'success');
+                loadServices();
+            })
+            .catch(() => showMessage('Could not update availability.', 'danger'));
+    }
+
+    function createPackage(serviceId) {
+        const email = getEmail();
+        const payload = {
+            packageType: document.getElementById(`pkgType-${serviceId}`).value,
+            packageName: document.getElementById(`pkgName-${serviceId}`).value,
+            description: document.getElementById(`pkgDescription-${serviceId}`).value,
+            price: Number(document.getElementById(`pkgPrice-${serviceId}`).value),
+            inclusions: document.getElementById(`pkgInclusions-${serviceId}`).value,
+            exclusions: document.getElementById(`pkgExclusions-${serviceId}`).value,
+            isActive: true
+        };
+
+        fetch(`/api/vendor/services/${serviceId}/packages?email=${encodeURIComponent(email)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(() => {
+                showMessage('Package added successfully.', 'success');
+                loadServices();
+            })
+            .catch(() => showMessage('Could not add package.', 'danger'));
+    }
+
+    loadServices();
+</script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Profile | Wedding Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --cream: #fdf8f2;
+            --dark: #1a1209;
+            --text-muted: #7a6a50;
+        }
+        body {
+            background: var(--cream);
+            color: var(--dark);
+            font-family: 'Montserrat', sans-serif;
+        }
+        .hero {
+            padding: 70px 0 30px;
+            text-align: center;
+        }
+        .tag {
+            color: var(--gold);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+        }
+        .title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.25rem;
+            font-weight: 300;
+        }
+        .panel {
+            background: #fff;
+            border: 1px solid rgba(201,168,76,0.15);
+            padding: 30px;
+            height: 100%;
+        }
+        .field-label {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .field-input, .field-select, .field-textarea {
+            width: 100%;
+            border: 1px solid #d8d1c4;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            background: #fff;
+        }
+        .field-textarea { min-height: 110px; }
+        .btn-dark {
+            background: var(--dark);
+            border-color: var(--dark);
+            border-radius: 0;
+        }
+        .btn-outline-dark { border-radius: 0; }
+        .meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .preview-img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            background: #eee;
+            border: 1px solid rgba(201,168,76,0.15);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <section class="hero">
+        <div class="tag">Vendor Profile Management</div>
+        <h1 class="title">Business Profile</h1>
+        <p class="meta">Create, edit, and present your vendor profile to couples and customers.</p>
+        <div class="d-flex justify-content-center gap-2 mt-3">
+            <a class="btn btn-outline-dark" href="/vendor/dashboard">Back to Dashboard</a>
+            <button class="btn btn-dark" onclick="loadProfile()">Refresh Profile</button>
+        </div>
+    </section>
+
+    <div id="messageBox" class="alert d-none"></div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-5">
+            <div class="panel">
+                <h3 class="mb-4" style="font-family:'Cormorant Garamond', serif;">Profile Preview</h3>
+                <img id="profileImage" class="preview-img mb-3" src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1000" alt="Profile preview">
+                <div class="meta mb-2"><strong>Status:</strong> <span id="profileStatus">Pending</span></div>
+                <div class="meta mb-2"><strong>Rating:</strong> <span id="profileRating">0.0</span></div>
+                <div class="meta mb-2"><strong>Reviews:</strong> <span id="profileReviews">0</span></div>
+                <div class="meta mb-2"><strong>Bookings:</strong> <span id="profileBookings">0</span></div>
+                <div class="meta"><strong>Portfolio:</strong> <span id="portfolioCount">0</span> item(s)</div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="panel">
+                <h3 class="mb-4" style="font-family:'Cormorant Garamond', serif;">Edit Profile</h3>
+                <form id="profileForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="field-label">Business Name</label>
+                            <input class="field-input" id="businessName" type="text">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="field-label">Category</label>
+                            <select class="field-select" id="category"></select>
+                        </div>
+                        <div class="col-12">
+                            <label class="field-label">Description</label>
+                            <textarea class="field-textarea" id="businessDescription"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="field-label">Location</label>
+                            <input class="field-input" id="businessLocation" type="text">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="field-label">Phone</label>
+                            <input class="field-input" id="businessPhone" type="text">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="field-label">Website</label>
+                            <input class="field-input" id="website" type="url">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="field-label">Service Areas</label>
+                            <input class="field-input" id="serviceAreas" type="text" placeholder="Colombo, Kandy, Galle">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="field-label">Profile Photo URL</label>
+                            <input class="field-input" id="profilePhotoUrl" type="text">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="field-label">Banner Image URL</label>
+                            <input class="field-input" id="bannerImageUrl" type="text">
+                        </div>
+                        <div class="col-12">
+                            <label class="field-label">Portfolio Media URLs</label>
+                            <textarea class="field-textarea" id="portfolioMediaUrls" placeholder="Comma-separated image/video URLs"></textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="button" class="btn btn-dark" onclick="saveProfile()">Save Profile</button>
+                        <label class="btn btn-outline-dark mb-0">
+                            Upload Photo
+                            <input type="file" id="photoUpload" hidden onchange="uploadProfilePhoto()">
+                        </label>
+                        <label class="btn btn-outline-dark mb-0">
+                            Add Portfolio Media
+                            <input type="file" id="portfolioUpload" hidden onchange="uploadPortfolioMedia()">
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const categories = [
+        'CATERING',
+        'PHOTOGRAPHY',
+        'FLORIST',
+        'VENUE',
+        'DJ',
+        'DECOR',
+        'CAKES',
+        'HAIR_MAKEUP',
+        'FOOD'
+    ];
+
+    function showMessage(message, type = 'success') {
+        const box = document.getElementById('messageBox');
+        box.className = `alert alert-${type}`;
+        box.textContent = message;
+        box.classList.remove('d-none');
+    }
+
+    function getEmail() {
+        return localStorage.getItem('userEmail') || '';
+    }
+
+    function populateCategories() {
+        const select = document.getElementById('category');
+        select.innerHTML = '<option value="">Select a category</option>';
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category.replaceAll('_', ' ');
+            select.appendChild(option);
+        });
+    }
+
+    function loadProfile() {
+        const email = getEmail();
+        if (!email) {
+            showMessage('No email found in localStorage. Please login first.', 'warning');
+            return;
+        }
+
+        fetch(`/api/vendor/profile?email=${encodeURIComponent(email)}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('businessName').value = data.businessName || '';
+                document.getElementById('businessDescription').value = data.businessDescription || '';
+                document.getElementById('businessLocation').value = data.businessLocation || '';
+                document.getElementById('businessPhone').value = data.businessPhone || '';
+                document.getElementById('website').value = data.website || '';
+                document.getElementById('category').value = data.category || '';
+                document.getElementById('serviceAreas').value = data.serviceAreas || '';
+                document.getElementById('profilePhotoUrl').value = data.profilePhotoUrl || '';
+                document.getElementById('bannerImageUrl').value = data.bannerImageUrl || '';
+                document.getElementById('portfolioMediaUrls').value = (data.portfolioMediaUrls || []).join(', ');
+                document.getElementById('profileStatus').textContent = data.verificationStatus || 'Pending';
+                document.getElementById('profileRating').textContent = data.averageRating ?? '0.0';
+                document.getElementById('profileReviews').textContent = data.totalReviews ?? '0';
+                document.getElementById('profileBookings').textContent = data.totalBookings ?? '0';
+                document.getElementById('portfolioCount').textContent = (data.portfolioMediaUrls || []).length;
+                document.getElementById('profileImage').src = data.profilePhotoUrl || 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1000';
+                showMessage('Profile loaded successfully.', 'success');
+            })
+            .catch(() => showMessage('Could not load profile.', 'danger'));
+    }
+
+    function saveProfile() {
+        const email = getEmail();
+        if (!email) {
+            showMessage('No email found in localStorage. Please login first.', 'warning');
+            return;
+        }
+
+        const payload = {
+            businessName: document.getElementById('businessName').value,
+            businessDescription: document.getElementById('businessDescription').value,
+            businessLocation: document.getElementById('businessLocation').value,
+            businessPhone: document.getElementById('businessPhone').value,
+            website: document.getElementById('website').value,
+            category: document.getElementById('category').value,
+            serviceAreas: document.getElementById('serviceAreas').value,
+            profilePhotoUrl: document.getElementById('profilePhotoUrl').value,
+            bannerImageUrl: document.getElementById('bannerImageUrl').value,
+            portfolioMediaUrls: document.getElementById('portfolioMediaUrls').value
+        };
+
+        fetch(`/api/vendor/profile?email=${encodeURIComponent(email)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(() => {
+                showMessage('Profile saved successfully.', 'success');
+                loadProfile();
+            })
+            .catch(() => showMessage('Could not save profile.', 'danger'));
+    }
+
+    function uploadProfilePhoto() {
+        const email = getEmail();
+        const fileInput = document.getElementById('photoUpload');
+        if (!fileInput.files.length) return;
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        fetch(`/api/vendor/profile/photo?email=${encodeURIComponent(email)}`, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(() => {
+                showMessage('Profile photo uploaded.', 'success');
+                loadProfile();
+            })
+            .catch(() => showMessage('Could not upload photo.', 'danger'));
+    }
+
+    function uploadPortfolioMedia() {
+        const email = getEmail();
+        const fileInput = document.getElementById('portfolioUpload');
+        if (!fileInput.files.length) return;
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        fetch(`/api/vendor/profile/portfolio?email=${encodeURIComponent(email)}`, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(() => {
+                showMessage('Portfolio media added.', 'success');
+                loadProfile();
+            })
+            .catch(() => showMessage('Could not upload portfolio media.', 'danger'));
+    }
+
+    populateCategories();
+    loadProfile();
+</script>
+</body>
+</html>

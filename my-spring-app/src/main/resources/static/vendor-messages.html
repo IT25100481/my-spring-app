@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Messages | Wedding Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --gold:#c9a84c; --cream:#fdf8f2; --dark:#1a1209; --text-muted:#7a6a50; }
+        body { background: var(--cream); color: var(--dark); font-family: Montserrat, sans-serif; }
+        .panel { background:#fff; border:1px solid rgba(201,168,76,.15); padding:24px; }
+        .small-muted { color: var(--text-muted); font-size: .9rem; }
+        .field-input, .field-textarea { width:100%; border:1px solid #d8d1c4; padding:10px 12px; margin-bottom:12px; }
+        .field-textarea { min-height:90px; }
+        .msg { border:1px solid rgba(201,168,76,.15); padding:14px; margin-bottom:10px; background:#fff; }
+        .btn-dark { background:var(--dark); border-color:var(--dark); border-radius:0; }
+        .btn-outline-dark { border-radius:0; }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <div class="text-uppercase" style="letter-spacing:5px;color:var(--gold);font-size:.65rem;">Messaging</div>
+            <h1 class="display-6" style="font-family:Georgia,serif;">Messages</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-dark" href="/vendor/dashboard">Dashboard</a>
+            <button class="btn btn-dark" onclick="loadInbox()">Reload</button>
+        </div>
+    </div>
+    <div id="messageBox" class="alert d-none"></div>
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="panel">
+                <h4 class="mb-3">Send Message</h4>
+                <input class="field-input" id="recipientEmail" placeholder="Recipient email">
+                <input class="field-input" id="bookingId" placeholder="Booking ID (optional)">
+                <textarea class="field-textarea" id="messageContent" placeholder="Message"></textarea>
+                <input class="field-input" id="attachmentUrl" placeholder="Attachment URL (optional)">
+                <button class="btn btn-dark" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="panel">
+                <h4 class="mb-3">Inbox</h4>
+                <div id="messagesList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const email = localStorage.getItem('userEmail') || '';
+    function showMessage(message, type='success') { const box=document.getElementById('messageBox'); box.className=`alert alert-${type}`; box.textContent=message; box.classList.remove('d-none'); }
+    function loadInbox() {
+        fetch(`/api/messages?email=${encodeURIComponent(email)}`)
+            .then(r => r.json())
+            .then(items => {
+                const list = document.getElementById('messagesList'); list.innerHTML='';
+                if (!items.length) { list.innerHTML = '<p class="small-muted mb-0">No messages found.</p>'; return; }
+                items.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className='msg';
+                    div.innerHTML = `<strong>${m.sender?.email || ''} → ${m.recipient?.email || ''}</strong><div class="small-muted">${m.messageContent || ''}</div><div class="small-muted">${m.createdAt || ''}</div>`;
+                    list.appendChild(div);
+                });
+            })
+            .catch(() => showMessage('Could not load messages.', 'danger'));
+    }
+    function sendMessage() {
+        const params = new URLSearchParams({
+            senderEmail: email,
+            recipientEmail: document.getElementById('recipientEmail').value,
+            message: document.getElementById('messageContent').value,
+            attachmentUrl: document.getElementById('attachmentUrl').value
+        });
+        const bookingId = document.getElementById('bookingId').value;
+        if (bookingId) params.append('bookingId', bookingId);
+        fetch('/api/messages', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: params })
+            .then(r => r.json())
+            .then(() => { showMessage('Message sent.'); loadInbox(); })
+            .catch(() => showMessage('Could not send message.', 'danger'));
+    }
+    loadInbox();
+</script>
+</body>
+</html>

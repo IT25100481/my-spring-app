@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Payments | Wedding Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --gold:#c9a84c; --cream:#fdf8f2; --dark:#1a1209; --text-muted:#7a6a50; }
+        body { background: var(--cream); color: var(--dark); font-family: Montserrat, sans-serif; }
+        .panel { background:#fff; border:1px solid rgba(201,168,76,.15); padding:24px; }
+        .small-muted { color: var(--text-muted); font-size: .9rem; }
+        .field-input, .field-select { width:100%; border:1px solid #d8d1c4; padding:10px 12px; margin-bottom:12px; }
+        .entry { border:1px solid rgba(201,168,76,.15); padding:14px; margin-bottom:10px; background:#fff; }
+        .btn-dark { background:var(--dark); border-color:var(--dark); border-radius:0; }
+        .btn-outline-dark { border-radius:0; }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <div class="text-uppercase" style="letter-spacing:5px;color:var(--gold);font-size:.65rem;">Payments</div>
+            <h1 class="display-6" style="font-family:Georgia,serif;">Invoices & Earnings</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-dark" href="/vendor/dashboard">Dashboard</a>
+            <button class="btn btn-dark" onclick="loadPayments()">Reload</button>
+        </div>
+    </div>
+    <div id="messageBox" class="alert d-none"></div>
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="panel mb-4">
+                <h4 class="mb-3">Generate Invoice</h4>
+                <input class="field-input" id="invoiceBookingId" placeholder="Booking ID">
+                <input class="field-input" id="subtotal" placeholder="Subtotal" type="number" step="0.01">
+                <input class="field-input" id="taxPercentage" placeholder="Tax %" type="number" step="0.01">
+                <input class="field-input" id="dueDate" type="date">
+                <button class="btn btn-dark" onclick="generateInvoice()">Generate</button>
+            </div>
+            <div class="panel">
+                <h4 class="mb-3">Record Payment</h4>
+                <input class="field-input" id="paymentBookingId" placeholder="Booking ID">
+                <input class="field-input" id="amountPaid" placeholder="Amount Paid" type="number" step="0.01">
+                <select class="field-select" id="paymentMethod">
+                    <option value="CREDIT_CARD">Credit Card</option>
+                    <option value="DEBIT_CARD">Debit Card</option>
+                    <option value="BANK_TRANSFER">Bank Transfer</option>
+                    <option value="CASH">Cash</option>
+                    <option value="DIGITAL_WALLET">Digital Wallet</option>
+                    <option value="PAYHERE">PayHere</option>
+                </select>
+                <input class="field-input" id="transactionId" placeholder="Transaction ID (optional)">
+                <button class="btn btn-dark" onclick="recordPayment()">Record</button>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="panel mb-4">
+                <h4 class="mb-3">Earnings</h4>
+                <div class="small-muted">Total Earnings: <strong id="earningsTotal">0.00</strong></div>
+            </div>
+            <div class="panel mb-4">
+                <h4 class="mb-3">Payments</h4>
+                <div id="paymentsList"></div>
+            </div>
+            <div class="panel">
+                <h4 class="mb-3">Invoices</h4>
+                <div id="invoicesList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const email = localStorage.getItem('userEmail') || '';
+    function showMessage(message, type='success') { const box=document.getElementById('messageBox'); box.className=`alert alert-${type}`; box.textContent=message; box.classList.remove('d-none'); }
+    function loadPayments() {
+        fetch(`/api/vendor/payments?email=${encodeURIComponent(email)}`)
+            .then(r => r.json())
+            .then(items => { const list=document.getElementById('paymentsList'); list.innerHTML=''; if (!items.length) list.innerHTML='<p class="small-muted mb-0">No payments found.</p>'; items.forEach(p => { const div=document.createElement('div'); div.className='entry'; div.innerHTML=`<strong>Booking #${p.booking?.id || ''}</strong><div class="small-muted">Amount Paid: ${p.amountPaid || 0}</div><div class="small-muted">Status: ${p.paymentStatus || ''}</div><div class="small-muted">Method: ${p.paymentMethod || ''}</div>`; list.appendChild(div); }); });
+        fetch(`/api/vendor/payments/invoices?email=${encodeURIComponent(email)}`)
+            .then(r => r.json())
+            .then(items => { const list=document.getElementById('invoicesList'); list.innerHTML=''; if (!items.length) list.innerHTML='<p class="small-muted mb-0">No invoices found.</p>'; items.forEach(i => { const div=document.createElement('div'); div.className='entry'; div.innerHTML=`<strong>${i.invoiceNumber || ''}</strong><div class="small-muted">Total: ${i.totalAmount || 0}</div><div class="small-muted">Status: ${i.status || ''}</div>`; list.appendChild(div); }); });
+        fetch(`/api/vendor/payments/earnings?email=${encodeURIComponent(email)}`)
+            .then(r => r.json())
+            .then(data => { document.getElementById('earningsTotal').textContent = data.earnings ?? 0; });
+    }
+    function generateInvoice() {
+        const params = new URLSearchParams({ email, bookingId: document.getElementById('invoiceBookingId').value, subtotal: document.getElementById('subtotal').value, taxPercentage: document.getElementById('taxPercentage').value, dueDate: document.getElementById('dueDate').value });
+        fetch('/api/vendor/payments/invoices?' + params.toString(), { method:'POST' })
+            .then(r => r.json())
+            .then(() => { showMessage('Invoice generated.'); loadPayments(); })
+            .catch(() => showMessage('Could not generate invoice.', 'danger'));
+    }
+    function recordPayment() {
+        const params = new URLSearchParams({ email, bookingId: document.getElementById('paymentBookingId').value, amountPaid: document.getElementById('amountPaid').value, paymentMethod: document.getElementById('paymentMethod').value, transactionId: document.getElementById('transactionId').value });
+        fetch('/api/vendor/payments/record?' + params.toString(), { method:'POST' })
+            .then(r => r.json())
+            .then(() => { showMessage('Payment recorded.'); loadPayments(); })
+            .catch(() => showMessage('Could not record payment.', 'danger'));
+    }
+    loadPayments();
+</script>
+</body>
+</html>

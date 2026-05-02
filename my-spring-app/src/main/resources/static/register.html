@@ -364,11 +364,6 @@
                 <label class="field-label">Category</label>
                 <select class="field-select" id="vendorCategory">
                     <option value="">Select a category</option>
-                    <option value="PHOTOGRAPHY">Photography</option>
-                    <option value="HAIR_MAKEUP">Hair & Makeup</option>
-                    <option value="FOOD">Food & Beverages</option>
-                    <option value="DECOR">Decorations</option>
-                    <option value="CAKES">Cakes</option>
                 </select>
             </div>
             <div class="field-group">
@@ -412,6 +407,26 @@
     function hideAlerts() {
         document.getElementById('successAlert').style.display = 'none';
         document.getElementById('errorAlert').style.display = 'none';
+    }
+
+    // Load categories from categories.txt
+    function loadCategories() {
+        fetch('/categories.txt')
+            .then(response => response.text())
+            .then(data => {
+                const select = document.getElementById('vendorCategory');
+                const lines = data.trim().split('\n');
+                lines.forEach(line => {
+                    const [value, text] = line.split(':');
+                    if (value && text) {
+                        const option = document.createElement('option');
+                        option.value = value;
+                        option.textContent = text;
+                        select.appendChild(option);
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading categories:', error));
     }
 
     // Register User
@@ -476,6 +491,9 @@
         })
         .catch(() => showError('Something went wrong. Please try again.'));
     }
+
+    // Load categories on page load
+    window.onload = loadCategories;
 </script>
 
 </body>
