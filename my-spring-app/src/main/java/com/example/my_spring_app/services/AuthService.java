@@ -113,7 +113,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setPassword(passwordEncoder.encode(newPassword));
-        user.setUpdatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now().toString());
         userService.saveUser(user);
 
         // emailService.sendPasswordResetEmail(email, user.getFullName());
@@ -131,7 +131,7 @@ public class AuthService {
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
-        user.setUpdatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now().toString());
         userService.saveUser(user);
     }
 

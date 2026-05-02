@@ -56,6 +56,7 @@ public class SecurityConfig {
             .and()
             .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/register/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers(
                         "/",

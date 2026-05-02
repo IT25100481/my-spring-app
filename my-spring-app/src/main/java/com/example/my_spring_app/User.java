@@ -23,9 +23,9 @@ public class User {
 
     private Boolean isActive = true;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private String createdAt;
 
-    private LocalDateTime updatedAt;
+    private String updatedAt;
 
     private String profileImageUrl;
 
@@ -36,10 +36,10 @@ public class User {
         this.phone = phone;
         this.role = UserRole.CUSTOMER;
         this.isActive = true;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now().toString();
     }
 
     protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now().toString();
     }
 }
