@@ -10,13 +10,23 @@
         body { background: var(--cream); font-family: 'Montserrat', sans-serif; color: var(--dark); }
         .navbar { background: var(--dark); padding: 18px 40px; }
         .navbar-brand { font-family: 'Cormorant Garamond', serif; color: var(--gold) !important; letter-spacing: 3px; }
+        .nav-link { color: rgba(255,255,255,0.75) !important; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; }
+        .nav-link:hover { color: var(--gold) !important; }
         .hotel-card { background: #fff; border: 1px solid rgba(201,168,76,0.2); transition: 0.4s; }
         .hotel-card:hover { transform: translateY(-10px); border-color: var(--gold); }
         .btn-gold { background: var(--gold); color: white; border-radius: 0; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px; }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-dark"><a class="navbar-brand" href="/">✦ Wedding Planner</a></nav>
+<nav class="navbar navbar-dark">
+    <a class="navbar-brand" href="/">✦ Wedding Planner</a>
+    <div class="ms-auto d-flex gap-4">
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/vendors.html">Vendors</a>
+        <a class="nav-link" href="/gallery.html">Gallery</a>
+        <a class="nav-link" href="/inquiry.html">Inquiry</a>
+    </div>
+</nav>
 <div class="container mt-5">
     <div class="text-center mb-5">
         <h1 style="font-family: 'Cormorant Garamond', serif; font-size: 3rem;">Exquisite <em>Venues</em></h1>
