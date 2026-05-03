@@ -63,6 +63,7 @@ public class SecurityConfig {
                         "/index.html",
                         "/login.html",
                         "/register.html",
+                        "/forgot-password.html",
                         "/vendors.html",
                         "/categories.txt",
                         "/favicon.ico",
