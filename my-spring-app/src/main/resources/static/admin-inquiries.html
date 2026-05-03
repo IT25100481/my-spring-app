@@ -464,6 +464,7 @@
     </div>
 
     <script>
+        const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:8080' : '';
         let allInquiries = [];
         let currentInquiryId = null;
 
@@ -474,7 +475,7 @@
         });
 
         function loadStatistics() {
-            fetch('/api/inquiries/statistics')
+            fetch(`${API_BASE}/api/inquiries/statistics`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('total-count').textContent = data.total;
@@ -486,7 +487,7 @@
         }
 
         function loadInquiries() {
-            fetch('/api/inquiries')
+            fetch(`${API_BASE}/api/inquiries`)
                 .then(response => response.json())
                 .then(data => {
                     allInquiries = data;
@@ -561,7 +562,7 @@
         }
 
         function viewInquiry(id) {
-            fetch(`/api/inquiries/${id}`)
+            fetch(`${API_BASE}/api/inquiries/${id}`)
                 .then(response => response.json())
                 .then(inquiry => {
                     alert(`Inquiry Details:
@@ -588,7 +589,7 @@ ${inquiry.responseMessage ? `Response: ${inquiry.responseMessage}` : ''}`);
 
         function openResponseModal(id) {
             currentInquiryId = id;
-            fetch(`/api/inquiries/${id}`)
+            fetch(`${API_BASE}/api/inquiries/${id}`)
                 .then(response => response.json())
                 .then(inquiry => {
                     document.getElementById('inquiryDetails').innerHTML = `
@@ -623,7 +624,7 @@ ${inquiry.responseMessage ? `Response: ${inquiry.responseMessage}` : ''}`);
 
             const params = new URLSearchParams({ responseMessage });
 
-            fetch(`/api/inquiries/${currentInquiryId}/respond`, {
+            fetch(`${API_BASE}/api/inquiries/${currentInquiryId}/respond`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params
@@ -655,7 +656,7 @@ ${inquiry.responseMessage ? `Response: ${inquiry.responseMessage}` : ''}`);
 
             const params = new URLSearchParams({ assignedTo });
 
-            fetch(`/api/inquiries/${currentInquiryId}/assign`, {
+            fetch(`${API_BASE}/api/inquiries/${currentInquiryId}/assign`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params
@@ -686,7 +687,7 @@ ${inquiry.responseMessage ? `Response: ${inquiry.responseMessage}` : ''}`);
                 params.append('adminNotes', adminNotes);
             }
 
-            fetch(`/api/inquiries/${id}/status`, {
+            fetch(`${API_BASE}/api/inquiries/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params

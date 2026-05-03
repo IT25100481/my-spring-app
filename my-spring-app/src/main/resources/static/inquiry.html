@@ -348,6 +348,8 @@
     </div>
 
     <script>
+        const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:8080' : '';
+
         function showSuccess(message) {
             const alert = document.getElementById('successAlert');
             alert.textContent = message;
@@ -388,7 +390,7 @@
 
             const params = new URLSearchParams({ name, email, phone, subject, message, inquiryType });
 
-            fetch('/api/inquiry', {
+            fetch(`${API_BASE}/api/inquiry`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params
@@ -396,6 +398,7 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
+                    localStorage.setItem('customerInquiryEmail', email);
                     const inquiryText = data.inquiryId ? ` Your inquiry ID is ${data.inquiryId}.` : '';
                     showSuccess(`${data.message}${inquiryText} You can check the reply on the customer reply page.`);
                     // Clear form

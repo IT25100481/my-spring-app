@@ -167,6 +167,8 @@
     </main>
 
     <script>
+        const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:8080' : '';
+
         function showMessage(text) {
             const message = document.getElementById('message');
             message.textContent = text;
@@ -199,7 +201,7 @@
             hideMessage();
             results.innerHTML = '';
 
-            fetch(`/api/inquiries/customer?email=${encodeURIComponent(email)}`)
+            fetch(`${API_BASE}/api/inquiries/customer?email=${encodeURIComponent(email)}`)
                 .then(response => response.json())
                 .then(inquiries => {
                     if (!Array.isArray(inquiries) || inquiries.length === 0) {
@@ -232,6 +234,14 @@
                     showMessage('Could not load replies. Please try again.');
                 });
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedEmail = localStorage.getItem('customerInquiryEmail');
+            if (savedEmail) {
+                document.getElementById('email').value = savedEmail;
+                loadReplies();
+            }
+        });
     </script>
 </body>
 </html>

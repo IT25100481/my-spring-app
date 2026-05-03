@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Customer Dashboard - Wedding Planner</title>
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-dark: #9a7a2e;
+            --cream: #fdf8f2;
+            --dark: #1a1209;
+            --muted: #7a6a50;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--cream);
+            color: var(--dark);
+            font-family: Arial, sans-serif;
+        }
+
+        .dashboard-nav {
+            height: 72px;
+            padding: 0 42px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1a1209;
+            color: #fff;
+        }
+
+        .brand {
+            color: var(--gold);
+            text-decoration: none;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: 18px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.78);
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-link:hover { color: var(--gold); }
+
+        .reply-notification {
+            border: 1px solid rgba(201,168,76,0.55);
+            background: rgba(255,255,255,0.05);
+            color: #12a8ff;
+            width: 42px;
+            height: 38px;
+            padding: 0;
+            position: relative;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reply-notification:hover {
+            background: rgba(201,168,76,0.12);
+        }
+
+        .reply-bell-icon {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+
+        .reply-badge {
+            display: none;
+            position: absolute;
+            top: -9px;
+            right: -9px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #dc3545;
+            color: #fff;
+            font-size: 11px;
+            line-height: 18px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .page {
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 46px 24px;
+        }
+
+        .welcome {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: end;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 34px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .action-card {
+            background: #fff;
+            border: 1px solid rgba(201,168,76,0.35);
+            padding: 22px;
+            text-decoration: none;
+            color: var(--dark);
+            min-height: 145px;
+        }
+
+        .action-card:hover {
+            border-color: var(--gold);
+        }
+
+        .action-card h2 {
+            margin: 0 0 10px;
+            font-size: 20px;
+        }
+
+        .action-card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        @media (max-width: 760px) {
+            .dashboard-nav {
+                padding: 0 18px;
+            }
+
+            .welcome,
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="dashboard-nav">
+        <a class="brand" href="/index.html">Wedding Planner</a>
+        <div class="nav-actions">
+            <a class="nav-link" href="/inquiry.html">Inquiry</a>
+            <a class="nav-link" href="/customer-inquiries.html">Replies</a>
+            <button class="reply-notification" onclick="openCustomerReplies()" title="Check inquiry replies">
+                <svg class="reply-bell-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V10a7 7 0 0 0-5-6.7V2a2 2 0 0 0-4 0v1.3A7 7 0 0 0 5 10v6l-2 2v1h18v-1l-2-2Z"/>
+                </svg>
+                <span class="reply-badge" id="replyBadge">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="page">
+        <section class="welcome">
+            <div>
+                <h1>Customer Dashboard</h1>
+                <p class="subtitle">Track your wedding planning inquiries and see admin replies from one place.</p>
+            </div>
+        </section>
+
+        <section class="quick-actions">
+            <a class="action-card" href="/inquiry.html">
+                <h2>Send Inquiry</h2>
+                <p>Ask about wedding planning, pricing, vendors, venues, or services.</p>
+            </a>
+            <a class="action-card" href="/customer-inquiries.html">
+                <h2>View Replies</h2>
+                <p>Check your inquiry status and admin reply using your email address.</p>
+            </a>
+            <a class="action-card" href="/vendors.html">
+                <h2>Browse Vendors</h2>
+                <p>Explore vendor services and wedding planning options.</p>
+            </a>
+        </section>
+    </main>
+
+    <script>
+        const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:8080' : '';
+
+        function openCustomerReplies() {
+            window.location.href = window.location.protocol === 'file:' ? 'customer-inquiries.html' : '/customer-inquiries.html';
+        }
+
+        function updateReplyNotification() {
+            const email = localStorage.getItem('customerInquiryEmail');
+            const badge = document.getElementById('replyBadge');
+
+            if (!email) {
+                return;
+            }
+
+            fetch(`${API_BASE}/api/inquiries/customer?email=${encodeURIComponent(email)}`)
+                .then(response => response.json())
+                .then(inquiries => {
+                    if (!Array.isArray(inquiries)) {
+                        return;
+                    }
+
+                    const replyCount = inquiries.filter(inquiry => inquiry.responseMessage).length;
+                    if (replyCount > 0) {
+                        badge.textContent = replyCount;
+                        badge.style.display = 'block';
+                    }
+                })
+                .catch(() => {});
+        }
+
+        document.addEventListener('DOMContentLoaded', updateReplyNotification);
+    </script>
+</body>
+</html>

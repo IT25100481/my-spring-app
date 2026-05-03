@@ -70,6 +70,7 @@ public class SecurityConfig {
                         "/register.html",
                         "/forgot-password.html",
                         "/inquiry.html",
+                        "/customer-dashboard.html",
                         "/customer-inquiries.html",
                         "/admin-inquiries.html",
                         "/vendors.html",
