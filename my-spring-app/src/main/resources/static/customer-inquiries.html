@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Inquiry Replies - Wedding Planner</title>
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #fdf8f2;
+            color: #1a1209;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            padding: 40px 16px;
+        }
+
+        .page {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin: 0;
+        }
+
+        .link {
+            color: #9a7a2e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .search-box {
+            background: #fff;
+            border: 1px solid rgba(201, 168, 76, 0.35);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+        }
+
+        .field-input {
+            width: 100%;
+            border: 1px solid rgba(201, 168, 76, 0.45);
+            padding: 12px 14px;
+            font-size: 15px;
+        }
+
+        .btn-check {
+            background: #c9a84c;
+            border: 1px solid #c9a84c;
+            color: #1a1209;
+            padding: 12px 20px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .message {
+            display: none;
+            padding: 14px;
+            margin-bottom: 18px;
+            border: 1px solid #c9a84c;
+            background: rgba(201, 168, 76, 0.12);
+        }
+
+        .inquiry-card {
+            background: #fff;
+            border: 1px solid rgba(201, 168, 76, 0.35);
+            padding: 22px;
+            margin-bottom: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .subject {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .status {
+            background: #f3ead0;
+            color: #7a5b12;
+            padding: 6px 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .meta {
+            color: #7a6a50;
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .reply {
+            border-top: 1px solid rgba(201, 168, 76, 0.25);
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .reply-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .empty-reply {
+            color: #7a6a50;
+            font-style: italic;
+        }
+
+        @media (max-width: 640px) {
+            .topbar,
+            .field-row,
+            .card-header {
+                grid-template-columns: 1fr;
+                flex-direction: column;
+            }
+
+            .btn-check {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <div class="topbar">
+            <h1>My Inquiry Replies</h1>
+            <a class="link" href="inquiry.html">Send New Inquiry</a>
+        </div>
+
+        <section class="search-box">
+            <label class="field-label" for="email">Email Address</label>
+            <div class="field-row">
+                <input class="field-input" id="email" type="email" placeholder="Enter the email used for your inquiry">
+                <button class="btn-check" onclick="loadReplies()">Check Replies</button>
+            </div>
+        </section>
+
+        <div class="message" id="message"></div>
+        <div id="results"></div>
+    </main>
+
+    <script>
+        function showMessage(text) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.style.display = 'block';
+        }
+
+        function hideMessage() {
+            document.getElementById('message').style.display = 'none';
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function loadReplies() {
+            const email = document.getElementById('email').value.trim();
+            const results = document.getElementById('results');
+
+            if (!email) {
+                showMessage('Please enter your email address.');
+                results.innerHTML = '';
+                return;
+            }
+
+            hideMessage();
+            results.innerHTML = '';
+
+            fetch(`/api/inquiries/customer?email=${encodeURIComponent(email)}`)
+                .then(response => response.json())
+                .then(inquiries => {
+                    if (!Array.isArray(inquiries) || inquiries.length === 0) {
+                        showMessage('No inquiries found for this email address.');
+                        return;
+                    }
+
+                    results.innerHTML = inquiries.map(inquiry => `
+                        <article class="inquiry-card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="subject">${escapeHtml(inquiry.subject)}</div>
+                                    <div class="meta">Inquiry ID: ${escapeHtml(inquiry.id)} | Sent: ${escapeHtml(inquiry.createdAt || 'N/A')}</div>
+                                </div>
+                                <div class="status">${escapeHtml(inquiry.status || 'pending')}</div>
+                            </div>
+                            <div><strong>Your Message:</strong> ${escapeHtml(inquiry.message)}</div>
+                            <div class="reply">
+                                <div class="reply-title">Admin Reply</div>
+                                ${
+                                    inquiry.responseMessage
+                                        ? `<div>${escapeHtml(inquiry.responseMessage)}</div>`
+                                        : '<div class="empty-reply">No reply yet. Please check again later.</div>'
+                                }
+                            </div>
+                        </article>
+                    `).join('');
+                })
+                .catch(() => {
+                    showMessage('Could not load replies. Please try again.');
+                });
+        }
+    </script>
+</body>
+</html>
