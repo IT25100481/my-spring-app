@@ -47,14 +47,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors()
-            .and()
-            .csrf().disable()
-            .exceptionHandling()
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeHttpRequests()
+            .cors(cors -> cors.disable())
+            .csrf(csrf -> csrf.disable())
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setContentType("application/json");
+                    response.setStatus(401);
+                    response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                })
+            )
+            .sessionManagement(sessionManagement -> sessionManagement
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/register/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
@@ -87,7 +92,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/vendor/**").hasRole("VENDOR")
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                 .anyRequest().authenticated()
-            .and()
+            )
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

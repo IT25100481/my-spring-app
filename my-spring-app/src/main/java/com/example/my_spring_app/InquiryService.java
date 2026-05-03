@@ -1,16 +1,15 @@
 package com.example.my_spring_app;
 
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.Comparator;
+import java.util.Objects;
+import java.time.LocalDateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class InquiryService {
@@ -52,7 +51,7 @@ public class InquiryService {
     public synchronized List<Inquiry> getPendingInquiries() {
         return readInquiries().stream()
                 .filter(inquiry -> "pending".equals(inquiry.getStatus()))
-                .collect(ArrayList::new, (list, item) -> list.add(item), List::addAll);
+                .collect(Collectors.toList());
     }
 
     private List<Inquiry> readInquiries() {

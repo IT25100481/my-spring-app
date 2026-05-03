@@ -50,4 +50,9 @@ public class VendorPageController {
     public String vendorAnalyticsPage() {
         return "forward:/vendor-analytics.html";
     }
+
+    @GetMapping("/vendors")
+    public String vendorsPage() {
+        return "forward:/vendors.html";
+    }
 }

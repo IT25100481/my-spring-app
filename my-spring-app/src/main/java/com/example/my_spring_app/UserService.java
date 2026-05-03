@@ -105,7 +105,7 @@ public class UserService {
         user.setPhone(parts[3].trim());
         user.setRole(UserRole.CUSTOMER);
         user.setIsActive(true);
-        user.setCreatedAt(LocalDateTime.now());
+        user.setCreatedAt(LocalDateTime.now().toString());
         return user;
     }
 
