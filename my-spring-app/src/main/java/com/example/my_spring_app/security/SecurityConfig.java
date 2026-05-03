@@ -65,6 +65,7 @@ public class SecurityConfig {
                         "/register.html",
                         "/vendors.html",
                         "/categories.txt",
+                        "/favicon.ico",
                         "/**/*.css",
                         "/**/*.js",
                         "/**/*.png",
