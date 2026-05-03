@@ -5,6 +5,8 @@ import com.example.my_spring_app.Vendor;
 import com.example.my_spring_app.dtos.*;
 import com.example.my_spring_app.security.JwtTokenProvider;
 import com.example.my_spring_app.services.AuthService;
+import com.example.my_spring_app.services.EmailService;
+import com.example.my_spring_app.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,6 +32,12 @@ public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * Register a new customer user
@@ -149,6 +158,39 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new AuthResponse("error", "Login failed: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Forgot password - send reset email
+     * POST /api/auth/forgot-password
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(new AuthResponse("error", "Email is required"));
+            }
+
+            // Check if user exists
+            Optional<User> userOptional = userService.findByEmailAndIsActiveTrue(email);
+            if (userOptional.isEmpty()) {
+                // Don't reveal if email exists or not for security
+                return ResponseEntity.ok(new AuthResponse("success", "If an account with that email exists, we've sent you a password reset link."));
+            }
+
+            User user = userOptional.get();
+
+            // Send password reset email
+            emailService.sendPasswordResetEmail(user.getEmail(), user.getFullName());
+
+            return ResponseEntity.ok(new AuthResponse("success", "If an account with that email exists, we've sent you a password reset link."));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse("error", "Failed to process request: " + e.getMessage()));
         }
     }
 }
