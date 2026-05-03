@@ -1,6 +1,7 @@
 package com.example.my_spring_app.services;
 
 import com.example.my_spring_app.Vendor;
+import com.example.my_spring_app.VendorService;
 import com.example.my_spring_app.dtos.VendorProfileResponse;
 import com.example.my_spring_app.dtos.VendorProfileUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;

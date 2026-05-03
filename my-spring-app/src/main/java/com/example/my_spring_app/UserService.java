@@ -1,6 +1,7 @@
 package com.example.my_spring_app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -20,7 +22,10 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private static final String FILE_PATH = "users.txt";
-    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    
+    // In-memory storage for now
+    private final List<User> users = new ArrayList<>();
 
     public synchronized User saveUser(User user) {
         List<User> users = readUsers();
@@ -32,9 +37,9 @@ public class UserService {
         }
 
         if (user.getCreatedAt() == null) {
-            user.setCreatedAt(LocalDateTime.now());
+            user.setCreatedAt(LocalDateTime.now().toString());
         }
-        user.setUpdatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now().toString());
 
         users.add(user);
         writeUsers(users);
@@ -69,34 +74,14 @@ public class UserService {
     }
 
     private List<User> readUsers() {
-        try {
-            Path path = Paths.get(FILE_PATH);
-            if (!Files.exists(path)) {
-                return new ArrayList<>();
-            }
-
-            return Files.lines(path)
-                    .filter(line -> !line.isBlank())
-                    .map(this::fromJson)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to read users from file", e);
-        }
+        // Return in-memory list for now
+        return new ArrayList<>(users);
     }
 
-    private void writeUsers(List<User> users) {
-        try {
-            Path path = Paths.get(FILE_PATH);
-            if (path.getParent() != null) {
-                Files.createDirectories(path.getParent());
-            }
-            List<String> lines = users.stream()
-                    .map(this::toJson)
-                    .collect(Collectors.toList());
-            Files.write(path, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to save users to file", e);
-        }
+    private void writeUsers(List<User> usersList) {
+        // Update in-memory list
+        users.clear();
+        users.addAll(usersList);
     }
 
     private User fromJson(String line) {

@@ -58,11 +58,30 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/register/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/vendor/**").permitAll()
-                .requestMatchers("/register.html", "/login.html", "/index.html", "/vendors.html").permitAll()
-                .requestMatchers("/vendor-*.html").permitAll()
-                .requestMatchers("/vendor-dashboard.html", "/vendor-dashboard-partd.html", "/vendor-analytics.html", "/vendor-payments.html").permitAll()
-                .requestMatchers("/static/**", "/categories.txt", "/api/categories.txt").permitAll()
+                .requestMatchers(
+                        "/",
+                        "/index.html",
+                        "/login.html",
+                        "/register.html",
+                        "/vendors.html",
+                        "/categories.txt",
+                        "/favicon.ico",
+                        "/vendor/**",
+                        "/vendor-*.html",
+                        "/vendor-dashboard.html",
+                        "/vendor-dashboard-partd.html",
+                        "/vendor-analytics.html",
+                        "/vendor-payments.html",
+                        "/static/**",
+                        "/api/categories.txt",
+                        "/**/*.css",
+                        "/**/*.js",
+                        "/**/*.png",
+                        "/**/*.jpg",
+                        "/**/*.jpeg",
+                        "/**/*.svg",
+                        "/**/*.ico"
+                ).permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/vendor/**").hasRole("VENDOR")
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")

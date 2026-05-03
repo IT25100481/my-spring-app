@@ -5,7 +5,7 @@ import com.example.my_spring_app.dtos.VendorProfileResponse;
 import com.example.my_spring_app.dtos.VendorProfileUpdateRequest;
 import com.example.my_spring_app.security.JwtTokenProvider;
 import com.example.my_spring_app.services.VendorProfileService;
-import com.example.my_spring_app.services.VendorService;
+import com.example.my_spring_app.VendorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
