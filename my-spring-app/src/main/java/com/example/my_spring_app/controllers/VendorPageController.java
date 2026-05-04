@@ -3,7 +3,9 @@ package com.example.my_spring_app.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@Controller
+// Controller disabled because vendor page routing is handled by VendorDashboardController and templates are used for pages.
+// Keeping this file for reference, but avoiding duplicated route mappings.
+// @Controller
 public class VendorPageController {
 
     @GetMapping("/vendor/profile")
@@ -49,10 +51,5 @@ public class VendorPageController {
     @GetMapping("/vendor/analytics")
     public String vendorAnalyticsPage() {
         return "forward:/vendor-analytics.html";
-    }
-
-    @GetMapping("/vendors")
-    public String vendorsPage() {
-        return "forward:/vendors.html";
     }
 }
