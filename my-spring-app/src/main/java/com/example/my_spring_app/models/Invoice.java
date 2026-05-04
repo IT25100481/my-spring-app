@@ -1,11 +1,11 @@
 package com.example.my_spring_app.models;
 
-import com.example.my_spring_app.User;
-import com.example.my_spring_app.Vendor;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "invoices")
@@ -21,53 +21,19 @@ public class Invoice {
     @Column(nullable = false, unique = true)
     private String invoiceNumber;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 
-    @ManyToOne
-    @JoinColumn(name = "vendor_id", nullable = false)
-    private Vendor vendor;
-
-    @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    private User customer;
-
+    // This field MUST be named 'amount' for .setAmount() to work in the service
     @Column(nullable = false)
-    private LocalDate invoiceDate;
+    private Double amount;
 
     private LocalDate dueDate;
 
-    @Column(nullable = false)
-    private Double subtotal;
+    @Column(name = "issued_date")
+    private LocalDate issuedDate = LocalDate.now();
 
-    private Double taxPercentage;
-
-    private Double taxAmount;
-
-    @Column(nullable = false)
-    private Double totalAmount;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private InvoiceStatus status = InvoiceStatus.DRAFT;
-
-    @Column(length = 2000)
-    private String itemsDescription;
-
-    private String pdfUrl;
-
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    private LocalDateTime sentAt;
-
-    private LocalDateTime paidAt;
-
-    private LocalDateTime updatedAt;
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
+    // You can add a status if you want to track if the invoice is SENT or PAID
+    private String status = "ISSUED";
 }

@@ -3,10 +3,7 @@ package com.example.my_spring_app;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -16,11 +13,8 @@ public class RegistrationController {
     @Autowired
     private UserService userService;
 
-    // @Autowired
-    // private VendorService vendorService;
-
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private VendorService vendorService;
 
     // ── USER REGISTRATION ──
     @PostMapping("/register/user")
@@ -39,20 +33,14 @@ public class RegistrationController {
             }
 
             // Save user
-            User user = new User();
-            user.setFullName(fullName);
-            user.setEmail(email);
-            user.setPassword(passwordEncoder.encode(password));
-            user.setPhone(phone);
-            user.setRole(UserRole.CUSTOMER);
-            user.setIsActive(true);
+            User user = new User(fullName, email, password, phone);
             userService.saveUser(user);
 
             return ResponseEntity.ok()
                     .body(Map.of("status", "success",
                             "message", "User registered successfully!"));
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.internalServerError()
                     .body(Map.of("status", "error",
                             "message", "Something went wrong. Try again."));
@@ -60,55 +48,34 @@ public class RegistrationController {
     }
 
     // ── VENDOR REGISTRATION ──
-    // @PostMapping("/register/vendor")
-    // public ResponseEntity<Map<String, String>> registerVendor(
-    //         @RequestParam String businessName,
-    //         @RequestParam String email,
-    //         @RequestParam String password,
-    //         @RequestParam String phone,
-    //         @RequestParam String category) {
+    @PostMapping("/register/vendor")
+    public ResponseEntity<Map<String, String>> registerVendor(
+            @RequestParam String businessName,
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String phone,
+            @RequestParam String category) {
 
-    //     try {
-    //         // Check if email already exists
-    //         if (vendorService.emailExists(email)) {
-    //             return ResponseEntity.badRequest()
-    //                 .body(Map.of("status", "error",
-    //                         "message", "Email already registered!"));
-    //         }
-
-    //         // Save vendor
-    //         Vendor vendor = new Vendor(businessName, email, password, phone, category);
-    //         vendorService.saveVendor(vendor);
-
-    //         return ResponseEntity.ok()
-    //             .body(Map.of("status", "success",
-    //                     "message", "Vendor registered successfully!"));
-
-    //     } catch (Exception e) {
-    //         return ResponseEntity.internalServerError()
-    //             .body(Map.of("status", "error",
-    //                     "message", "Something went wrong. Try again."));
-    //     }
-    // }
-
-    // ── GET CATEGORIES ──
-    @GetMapping("/categories.txt")
-    public ResponseEntity<String> getCategories() {
         try {
-            Path path = Paths.get("categories.txt");
-            if (!Files.exists(path)) {
-                return ResponseEntity.ok()
-                        .header("Content-Type", "text/plain")
-                        .body("");
+            // Check if email already exists
+            if (vendorService.emailExists(email)) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("status", "error",
+                                "message", "Email already registered!"));
             }
-            String content = Files.readString(path);
+
+            // Save vendor
+            Vendor vendor = new Vendor(businessName, email, password, phone, category);
+            vendorService.saveVendor(vendor);
+
             return ResponseEntity.ok()
-                    .header("Content-Type", "text/plain")
-                    .body(content);
-        } catch (Exception e) {
+                    .body(Map.of("status", "success",
+                            "message", "Vendor registered successfully!"));
+
+        } catch (IOException e) {
             return ResponseEntity.internalServerError()
-                    .header("Content-Type", "text/plain")
-                    .body("");
+                    .body(Map.of("status", "error",
+                            "message", "Something went wrong. Try again."));
         }
     }
 }

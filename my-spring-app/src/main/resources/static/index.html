@@ -3,7 +3,7 @@
 <head>
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/833/833472.png">
     <title>Wedding Planner System</title>
-    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
@@ -119,6 +119,14 @@
         .btn-register:hover {
             background: var(--gold-dark);
             border-color: var(--gold-dark);
+        }
+
+        .navbar-toggler {
+            border-color: rgba(201,168,76,0.5);
+        }
+
+        .navbar-toggler-icon {
+            filter: invert(1);
         }
 
         /* ── HERO ── */
@@ -578,6 +586,7 @@
         .gold-divider i { color: var(--gold); font-size: 0.6rem; }
 
         @media (max-width: 768px) {
+            .navbar { padding: 14px 20px; }
             .hero-content { padding: 0 30px; }
             .section { padding: 70px 30px; }
             .gallery-section { padding: 70px 30px; }
@@ -595,18 +604,25 @@
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg">
     <a class="navbar-brand" href="/">✦ Wedding Planner</a>
-    <div class="ms-auto d-flex align-items-center gap-4">
-        <div class="d-flex gap-4 d-none d-lg-flex">
-            <a class="nav-link" href="/">Home</a>
-            <a class="nav-link" href="/vendors.html">Vendors</a>
-            <a class="nav-link" href="/hotels.html">Hotels</a>
-            <a class="nav-link" href="/gallery.html">Gallery</a>
-            <a class="nav-link" href="/about.html">About</a>
-            <a class="nav-link" href="/inquiry.html">Inquiry</a>
-        </div>
-        <div class="d-flex gap-2 ms-3">
-            <a href="/login.html" class="btn-login">Login</a>
-            <a href="/register.html" class="btn-register">Register</a>
+
+    <button class="navbar-toggler ms-auto me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center w-100">
+            <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-4 ms-lg-4">
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/vendors.html">Vendors</a>
+                <a class="nav-link" href="/hotels.html">Hotels</a>
+                <a class="nav-link" href="/gallery.html">Gallery</a>
+                <a class="nav-link" href="/about.html">About</a>
+                <a class="nav-link" href="/inquiry.html">Inquiry</a>
+            </div>
+            <div class="d-flex gap-2 ms-lg-auto mt-3 mt-lg-0">
+                <a href="/login.html" class="btn-login">Login</a>
+                <a href="/register.html" class="btn-register">Register</a>
+            </div>
         </div>
     </div>
 </nav>
@@ -791,4 +807,3 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-```

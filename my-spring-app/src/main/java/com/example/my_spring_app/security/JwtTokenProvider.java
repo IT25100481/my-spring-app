@@ -1,12 +1,9 @@
 package com.example.my_spring_app.security;
 
-import com.example.my_spring_app.User;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.example.my_spring_app.UserService;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -35,42 +32,10 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String generateTokenFromUser(User user) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpiration);
-
-        return Jwts.builder()
-                .setSubject(user.getEmail())
-                .claim("userId", user.getId())
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret.getBytes(StandardCharsets.UTF_8))
-                .compact();
-    }
-
-    public Long getUserIdFromToken(String token) {
-        try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(jwtSecret)
-                    .parseClaimsJws(token)
-                    .getBody();
-            Object userId = claims.get("userId");
-            if (userId instanceof Number) {
-                return ((Number) userId).longValue();
-            }
-            if (userId instanceof String) {
-                return Long.valueOf((String) userId);
-            }
-            return null;
-        } catch (JwtException | IllegalArgumentException e) {
-            return null;
-        }
-    }
-
     public String getUserEmailFromToken(String token) {
         try {
             return Jwts.parser()
-                    .setSigningKey(jwtSecret.getBytes(StandardCharsets.UTF_8))
+                    .setSigningKey(jwtSecret)
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
@@ -82,7 +47,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .setSigningKey(jwtSecret.getBytes(StandardCharsets.UTF_8))
+                    .setSigningKey(jwtSecret)
                     .parseClaimsJws(token);
             return true;
         } catch (SecurityException e) {
@@ -98,18 +63,4 @@ public class JwtTokenProvider {
         }
         return false;
     }
-
-    // Return the user id associated with the token's subject (email), or null if not found
-    public Long getUserIdFromToken(String token) {
-        try {
-            String email = getUserEmailFromToken(token);
-            if (email == null) return null;
-            return userService.findByEmail(email).map(u -> u.getId()).orElse(null);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @Autowired
-    private UserService userService;
 }

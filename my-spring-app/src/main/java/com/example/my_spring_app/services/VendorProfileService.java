@@ -1,10 +1,12 @@
 package com.example.my_spring_app.services;
 
+import com.example.my_spring_app.User;
 import com.example.my_spring_app.Vendor;
-import com.example.my_spring_app.VendorService;
 import com.example.my_spring_app.dtos.VendorProfileResponse;
 import com.example.my_spring_app.dtos.VendorProfileUpdateRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.my_spring_app.models.Review;
+import com.example.my_spring_app.repositories.ReviewRepository;
+import com.example.my_spring_app.repositories.VendorRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -15,35 +17,40 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class VendorProfileService {
 
-    @Autowired
-    private VendorService vendorService;
+    private final VendorRepository vendorRepository;
+    private final ReviewRepository reviewRepository;
 
     @Value("${file.upload-dir:uploads/}")
     private String uploadDir;
 
+    public VendorProfileService(VendorRepository vendorRepository, ReviewRepository reviewRepository) {
+        this.vendorRepository = vendorRepository;
+        this.reviewRepository = reviewRepository;
+    }
+
     public VendorProfileResponse getVendorProfile(Long vendorId) {
-        Vendor vendor = vendorService.findById(vendorId)
+        Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
         return toResponse(vendor);
     }
 
     public VendorProfileResponse getVendorProfileByEmail(String email) {
-        Vendor vendor = vendorService.findByUserEmail(email)
+        Vendor vendor = vendorRepository.findByUser_Email(email)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
         return toResponse(vendor);
     }
 
     public VendorProfileResponse updateVendorProfile(Long vendorId, VendorProfileUpdateRequest request) {
-        Vendor vendor = vendorService.findById(vendorId)
+        Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
         if (request.getBusinessName() != null) vendor.setBusinessName(request.getBusinessName().trim());
@@ -64,31 +71,32 @@ public class VendorProfileService {
             vendor.getUser().setPhone(request.getBusinessPhone().trim());
         }
 
-        return toResponse(vendorService.saveVendor(vendor));
+        return toResponse(vendorRepository.save(vendor));
     }
 
     public VendorProfileResponse uploadProfilePhoto(Long vendorId, MultipartFile file) {
         String savedPath = saveFile(file, "vendor-profile");
-        Vendor vendor = vendorService.findById(vendorId)
+        Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
         vendor.setProfilePhotoUrl(savedPath);
-        return toResponse(vendorService.saveVendor(vendor));
+        return toResponse(vendorRepository.save(vendor));
     }
 
     public VendorProfileResponse uploadPortfolioMedia(Long vendorId, MultipartFile file) {
         String savedPath = saveFile(file, "vendor-portfolio");
-        Vendor vendor = vendorService.findById(vendorId)
+        Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
         List<String> portfolioUrls = parseList(vendor.getPortfolioMediaUrls());
         portfolioUrls.add(savedPath);
         vendor.setPortfolioMediaUrls(String.join(",", portfolioUrls));
 
-        return toResponse(vendorService.saveVendor(vendor));
+        return toResponse(vendorRepository.save(vendor));
     }
 
     public List<VendorProfileResponse> searchVendors(String category, String location) {
-        return vendorService.getAllVendors().stream()
+        List<Vendor> vendors = vendorRepository.findAll();
+        return vendors.stream()
                 .filter(vendor -> category == null || category.isBlank() || category.equalsIgnoreCase(vendor.getCategory()))
                 .filter(vendor -> location == null || location.isBlank() || containsIgnoreCase(vendor.getBusinessLocation(), location))
                 .map(this::toResponse)
