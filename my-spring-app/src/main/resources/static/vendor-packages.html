@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Packages – Wedding Planner</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/833/833472.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-light: #e8d5a3;
+            --gold-dark: #9a7a2e;
+            --cream: #fdf8f2;
+            --dark: #1a1209;
+            --dark-mid: #2e2010;
+            --text-muted: #7a6a50;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--cream);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            color: var(--dark);
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background: rgba(26,18,9,0.97) !important;
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            padding: 18px 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: var(--gold) !important;
+            letter-spacing: 3px;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.75) !important;
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .nav-link:hover { color: var(--gold) !important; }
+        .btn-login {
+            border: 1px solid rgba(201,168,76,0.5);
+            color: var(--gold) !important;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px 20px;
+            border-radius: 0;
+            text-decoration: none;
+        }
+        .btn-register {
+            background: var(--gold);
+            color: var(--dark) !important;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px 22px;
+            border-radius: 0;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid var(--gold);
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            background: var(--dark);
+            padding: 60px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=1200') center/cover;
+            opacity: 0.07;
+        }
+        .page-header-content { position: relative; z-index: 2; }
+        .page-tag {
+            font-size: 0.65rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 12px;
+        }
+        .page-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 300;
+            color: #fff;
+        }
+        .page-title em { font-style: italic; color: var(--gold-light); }
+
+        /* ── MAIN CONTENT ── */
+        .main-content { padding: 60px 80px; }
+
+        /* ── FILTER BAR ── */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-btn {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px 24px;
+            border-radius: 0;
+            border: 1px solid rgba(201,168,76,0.4);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--gold);
+            color: var(--dark);
+            border-color: var(--gold);
+        }
+        .btn-add-package {
+            margin-left: auto;
+            background: var(--gold);
+            color: var(--dark);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 10px 28px;
+            border-radius: 0;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-add-package:hover { background: var(--gold-dark); color: #fff; }
+
+        /* ── PACKAGE CARDS ── */
+        .package-card {
+            background: #fff;
+            border: 1px solid rgba(201,168,76,0.2);
+            padding: 36px;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+        .package-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 2px;
+            background: var(--gold);
+            transition: width 0.4s;
+        }
+        .package-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(26,18,9,0.1); }
+        .package-card:hover::before { width: 100%; }
+
+        .package-type-badge {
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 4px 14px;
+            border-radius: 0;
+            display: inline-block;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        .badge-basic { background: rgba(201,168,76,0.15); color: var(--gold-dark); }
+        .badge-premium { background: var(--gold); color: var(--dark); }
+        .badge-custom { background: var(--dark); color: var(--gold); }
+
+        .package-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        .package-price {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            font-weight: 300;
+            margin-bottom: 16px;
+        }
+        .package-price span { font-size: 1rem; }
+        .package-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        .inclusions-title {
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        .inclusion-item {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .inclusion-item::before { content: '✦'; color: var(--gold); font-size: 0.5rem; }
+
+        .package-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(201,168,76,0.15);
+        }
+        .btn-edit {
+            flex: 1;
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px;
+            border: 1px solid rgba(201,168,76,0.4);
+            background: transparent;
+            color: var(--gold);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+        .btn-edit:hover { background: rgba(201,168,76,0.1); }
+        .btn-delete {
+            flex: 1;
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px;
+            border: 1px solid rgba(255,0,0,0.2);
+            background: transparent;
+            color: #c0392b;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+        .btn-delete:hover { background: rgba(255,0,0,0.05); }
+
+        .inactive-badge {
+            position: absolute;
+            top: 16px; right: 16px;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: rgba(255,0,0,0.1);
+            color: #c0392b;
+            padding: 3px 10px;
+        }
+
+        /* ── MODAL ── */
+        .modal-content {
+            border-radius: 0;
+            border: 1px solid rgba(201,168,76,0.3);
+        }
+        .modal-header {
+            background: var(--dark);
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            padding: 24px 32px;
+        }
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            font-weight: 300;
+        }
+        .modal-body { padding: 32px; }
+        .form-label {
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .form-control, .form-select {
+            border-radius: 0;
+            border: 1px solid rgba(201,168,76,0.3);
+            font-size: 0.85rem;
+            padding: 10px 14px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(201,168,76,0.15);
+        }
+        .btn-save {
+            background: var(--gold);
+            color: var(--dark);
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 32px;
+            border-radius: 0;
+            border: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-save:hover { background: var(--gold-dark); color: #fff; }
+        .btn-cancel {
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 32px;
+            border-radius: 0;
+            border: 1px solid rgba(201,168,76,0.3);
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--text-muted);
+        }
+        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 20px; }
+        .empty-state h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-weight: 300;
+            margin-bottom: 12px;
+        }
+        .empty-state p { font-size: 0.85rem; }
+
+        /* ── TOAST ── */
+        .toast-container { z-index: 9999; }
+
+        @media (max-width: 768px) {
+            .page-header { padding: 40px 20px; }
+            .main-content { padding: 40px 20px; }
+            .navbar { padding: 14px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="/">✦ Wedding Planner</a>
+    <button class="navbar-toggler ms-auto me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon" style="filter:invert(1)"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center w-100">
+            <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-4 ms-lg-4">
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/vendors.html">Vendors</a>
+                <a class="nav-link" href="/hotels.html">Hotels</a>
+                <a class="nav-link" href="/gallery.html">Gallery</a>
+                <a class="nav-link" href="/about.html">About</a>
+            </div>
+            <div class="d-flex gap-2 ms-lg-auto mt-3 mt-lg-0">
+                <a href="/login.html" class="btn-login">Login</a>
+                <a href="/register.html" class="btn-register">Register</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <div class="page-header-content">
+        <div class="page-tag">Vendor Dashboard</div>
+        <h1 class="page-title">Service <em>Packages</em></h1>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterPackages('ALL')">All</button>
+        <button class="filter-btn" onclick="filterPackages('BASIC')">Basic</button>
+        <button class="filter-btn" onclick="filterPackages('PREMIUM')">Premium</button>
+        <button class="filter-btn" onclick="filterPackages('CUSTOM')">Custom</button>
+        <button class="btn-add-package" onclick="openAddModal()">+ Add Package</button>
+    </div>
+
+    <!-- PACKAGES GRID -->
+    <div class="row g-4" id="packagesGrid">
+        <!-- Packages loaded here by JS -->
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state d-none" id="emptyState">
+        <div class="empty-icon">💍</div>
+        <h4>No Packages Yet</h4>
+        <p>Add your first service package to start attracting clients.</p>
+    </div>
+
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal fade" id="packageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Add New Package</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="packageId">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Package Name</label>
+                        <input type="text" class="form-control" id="packageName" placeholder="e.g. Gold Wedding Package">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Package Type</label>
+                        <select class="form-select" id="packageType">
+                            <option value="BASIC">Basic</option>
+                            <option value="PREMIUM">Premium</option>
+                            <option value="CUSTOM">Custom</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Price (LKR)</label>
+                        <input type="number" class="form-control" id="packagePrice" placeholder="e.g. 150000">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="packageStatus">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="packageDesc" rows="3" placeholder="Describe what this package offers..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Inclusions (one per line)</label>
+                        <textarea class="form-control" id="packageInclusions" rows="4" placeholder="Bridal decoration&#10;Photography - 8 hours&#10;Wedding cake"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Exclusions (one per line)</label>
+                        <textarea class="form-control" id="packageExclusions" rows="3" placeholder="Catering&#10;Transport&#10;Accommodation"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 px-4 pb-4">
+                <button class="btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn-save ms-2" onclick="savePackage()">Save Package</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="font-family:'Cormorant Garamond',serif;color:#c0392b;font-size:1.3rem;">Delete Package</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="font-size:0.85rem;color:var(--text-muted);">
+                Are you sure you want to delete this package? This action cannot be undone.
+            </div>
+            <div class="modal-footer border-0">
+                <button class="btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn-delete ms-2" style="padding:8px 20px;" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMsg">Package saved successfully!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── STATE ──
+    let allPackages = [];
+    let currentFilter = 'ALL';
+    let deleteTargetId = null;
+
+    // ── ON LOAD ──
+    document.addEventListener('DOMContentLoaded', () => {
+        loadPackages();
+    });
+
+    // ── LOAD ALL PACKAGES ──
+    async function loadPackages() {
+        try {
+            const res = await fetch('/api/packages');
+            allPackages = await res.json();
+            renderPackages(allPackages);
+        } catch (err) {
+            console.error('Failed to load packages:', err);
+            showSampleData();
+        }
+    }
+
+    // ── SAMPLE DATA (fallback if API not ready) ──
+    function showSampleData() {
+        allPackages = [
+            { id: 1, packageName: 'Silver Wedding Package', packageType: 'BASIC', price: 75000, description: 'A beautiful basic package for intimate weddings.', inclusions: 'Bridal decoration\nBasic photography\nWedding cake', exclusions: 'Catering\nTransport', isActive: true },
+            { id: 2, packageName: 'Gold Wedding Package', packageType: 'PREMIUM', price: 150000, description: 'Our most popular premium package for grand celebrations.', inclusions: 'Luxury decoration\nProfessional photography\nVideography\nWedding cake\nFloral arrangements', exclusions: 'Catering\nAccommodation', isActive: true },
+            { id: 3, packageName: 'Diamond Package', packageType: 'CUSTOM', price: 300000, description: 'Fully customised package tailored to your dream wedding.', inclusions: 'Everything included\nPersonal wedding coordinator\nLuxury transport', exclusions: 'Honeymoon', isActive: true },
+        ];
+        renderPackages(allPackages);
+    }
+
+    // ── RENDER PACKAGES ──
+    function renderPackages(packages) {
+        const grid = document.getElementById('packagesGrid');
+        const empty = document.getElementById('emptyState');
+        const filtered = currentFilter === 'ALL' ? packages : packages.filter(p => p.packageType === currentFilter);
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '';
+            empty.classList.remove('d-none');
+            return;
+        }
+
+        empty.classList.add('d-none');
+        grid.innerHTML = filtered.map(pkg => `
+            <div class="col-md-4">
+                <div class="package-card">
+                    ${!pkg.isActive ? '<span class="inactive-badge">Inactive</span>' : ''}
+                    <span class="package-type-badge badge-${pkg.packageType.toLowerCase()}">${pkg.packageType}</span>
+                    <div class="package-name">${pkg.packageName}</div>
+                    <div class="package-price"><span>LKR </span>${pkg.price.toLocaleString()}</div>
+                    <div class="package-desc">${pkg.description || ''}</div>
+                    ${pkg.inclusions ? `
+                        <div class="inclusions-title">Inclusions</div>
+                        ${pkg.inclusions.split('\n').map(i => `<div class="inclusion-item">${i}</div>`).join('')}
+                    ` : ''}
+                    <div class="package-actions">
+                        <button class="btn-edit" onclick="openEditModal(${pkg.id})">Edit</button>
+                        <button class="btn-delete" onclick="openDeleteModal(${pkg.id})">Delete</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ── FILTER ──
+    function filterPackages(type) {
+        currentFilter = type;
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        renderPackages(allPackages);
+    }
+
+    // ── OPEN ADD MODAL ──
+    function openAddModal() {
+        document.getElementById('modalTitle').textContent = 'Add New Package';
+        document.getElementById('packageId').value = '';
+        document.getElementById('packageName').value = '';
+        document.getElementById('packageType').value = 'BASIC';
+        document.getElementById('packagePrice').value = '';
+        document.getElementById('packageDesc').value = '';
+        document.getElementById('packageInclusions').value = '';
+        document.getElementById('packageExclusions').value = '';
+        document.getElementById('packageStatus').value = 'true';
+        new bootstrap.Modal(document.getElementById('packageModal')).show();
+    }
+
+    // ── OPEN EDIT MODAL ──
+    function openEditModal(id) {
+        const pkg = allPackages.find(p => p.id === id);
+        if (!pkg) return;
+        document.getElementById('modalTitle').textContent = 'Edit Package';
+        document.getElementById('packageId').value = pkg.id;
+        document.getElementById('packageName').value = pkg.packageName;
+        document.getElementById('packageType').value = pkg.packageType;
+        document.getElementById('packagePrice').value = pkg.price;
+        document.getElementById('packageDesc').value = pkg.description || '';
+        document.getElementById('packageInclusions').value = pkg.inclusions || '';
+        document.getElementById('packageExclusions').value = pkg.exclusions || '';
+        document.getElementById('packageStatus').value = String(pkg.isActive);
+        new bootstrap.Modal(document.getElementById('packageModal')).show();
+    }
+
+    // ── SAVE PACKAGE (Create or Update) ──
+    async function savePackage() {
+        const id = document.getElementById('packageId').value;
+        const payload = {
+            packageName: document.getElementById('packageName').value,
+            packageType: document.getElementById('packageType').value,
+            price: parseFloat(document.getElementById('packagePrice').value),
+            description: document.getElementById('packageDesc').value,
+            inclusions: document.getElementById('packageInclusions').value,
+            exclusions: document.getElementById('packageExclusions').value,
+            isActive: document.getElementById('packageStatus').value === 'true'
+        };
+
+        try {
+            const url = id ? `/api/packages/${id}` : '/api/packages';
+            const method = id ? 'PUT' : 'POST';
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('packageModal')).hide();
+                showToast(id ? 'Package updated successfully!' : 'Package added successfully!', 'success');
+                loadPackages();
+            }
+        } catch (err) {
+            showToast('Failed to save package.', 'danger');
+        }
+    }
+
+    // ── DELETE ──
+    function openDeleteModal(id) {
+        deleteTargetId = id;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+
+    async function confirmDelete() {
+        try {
+            await fetch(`/api/packages/${deleteTargetId}`, { method: 'DELETE' });
+            bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+            showToast('Package deleted successfully!', 'success');
+            loadPackages();
+        } catch (err) {
+            showToast('Failed to delete package.', 'danger');
+        }
+    }
+
+    // ── TOAST ──
+    function showToast(message, type) {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        toast.className = `toast align-items-center text-white border-0 bg-${type}`;
+        toastMsg.textContent = message;
+        new bootstrap.Toast(toast).show();
+    }
+</script>
+</body>
+</html>
