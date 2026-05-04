@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 package com.example.my_spring_app;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,3 +81,4 @@ public class RegistrationController {
         }
     }
 }
+>>>>>>> 7a40e1a4c1010b97116ea33a1a9d2af62645b669

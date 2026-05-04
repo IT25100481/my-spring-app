@@ -44,6 +44,61 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+<<<<<<< HEAD
+            .cors(cors -> cors.disable())
+            .csrf(csrf -> csrf.disable())
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setContentType("application/json");
+                    response.setStatus(401);
+                    response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                })
+            )
+            .sessionManagement(sessionManagement -> sessionManagement
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/register/**").permitAll()
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers(
+                        "/",
+                        "/index.html",
+                        "/login.html",
+                        "/register.html",
+                        "/forgot-password.html",
+                        "/inquiry.html",
+                        "/customer-dashboard.html",
+                        "/customer-inquiries.html",
+                        "/admin-inquiries.html",
+                        "/vendors.html",
+                        "/categories.txt",
+                        "/favicon.ico",
+                        "/vendor/**",
+                        "/vendor-*.html",
+                        "/vendor-dashboard.html",
+                        "/vendor-dashboard-partd.html",
+                        "/vendor-analytics.html",
+                        "/vendor-payments.html",
+                        "/static/**",
+                        "/api/inquiry",
+                        "/api/inquiries/**",
+                        "/api/categories.txt",
+                        "/**/*.css",
+                        "/**/*.js",
+                        "/**/*.png",
+                        "/**/*.jpg",
+                        "/**/*.jpeg",
+                        "/**/*.svg",
+                        "/**/*.ico"
+                ).permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/vendor/**").hasRole("VENDOR")
+                .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+=======
                 // 1. Enable CORS and Disable CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
@@ -96,6 +151,7 @@ public class SecurityConfig {
 
                 // 4. Add JWT Filter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+>>>>>>> 7a40e1a4c1010b97116ea33a1a9d2af62645b669
 
         return http.build();
     }

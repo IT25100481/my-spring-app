@@ -1,13 +1,10 @@
 package com.example.my_spring_app.security;
 
-import com.example.my_spring_app.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.example.my_spring_app.UserService;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -38,6 +35,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+<<<<<<< HEAD
     public String generateTokenFromUser(User user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpiration);
@@ -58,6 +56,12 @@ public class JwtTokenProvider {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
+=======
+    public String getUserEmailFromToken(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(jwtSecret)
+>>>>>>> 7a40e1a4c1010b97116ea33a1a9d2af62645b669
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
@@ -68,10 +72,15 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
+<<<<<<< HEAD
             SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
+=======
+            Jwts.parser()
+                    .setSigningKey(jwtSecret)
+>>>>>>> 7a40e1a4c1010b97116ea33a1a9d2af62645b669
                     .parseClaimsJws(token);
             return true;
         } catch (SecurityException e) {
@@ -87,6 +96,7 @@ public class JwtTokenProvider {
         }
         return false;
     }
+<<<<<<< HEAD
 
     public Long getUserIdFromToken(String token) {
         try {
@@ -100,4 +110,6 @@ public class JwtTokenProvider {
 
     @Autowired
     private UserService userService;
+=======
+>>>>>>> 7a40e1a4c1010b97116ea33a1a9d2af62645b669
 }
