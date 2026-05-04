@@ -22,4 +22,13 @@ public class ReviewRequestDTO {
     @NotBlank(message = "Review text is required")
     @Size(min = 10, max = 2000, message = "Review must be between 10 and 2000 characters")
     private String reviewText;
+
+    // Explicit getter for Lombok compatibility
+    public Long getVendorId() {
+        return this.vendorId;
+    }
+
+    public void setVendorId(Long vendorId) {
+        this.vendorId = vendorId;
+    }
 }
